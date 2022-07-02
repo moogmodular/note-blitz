@@ -52,8 +52,10 @@ export const UXContext = createContext<{
     dispatch: React.Dispatch<any>
 }>({ state: initialState, dispatch: () => null })
 
-export const UXProvider = ({ children }: any) => {
+const UXProvider = ({ children }: any) => {
     const [state, dispatch] = useReducer(reducer, initialState)
 
     return <UXContext.Provider value={{ state, dispatch }}>{children}</UXContext.Provider>
 }
+
+export default UXProvider

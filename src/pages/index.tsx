@@ -11,7 +11,7 @@ import Header from './components/Header'
 import IsolatedPost from './components/IsolatedPost'
 import PostTimeline from './components/post/PostTimeline'
 import SiteMeta from './components/SiteMeta'
-import { UXProvider } from './context/UXContext'
+import UXProvider from './context/UXContext'
 
 const theme = createTheme({
     typography: {

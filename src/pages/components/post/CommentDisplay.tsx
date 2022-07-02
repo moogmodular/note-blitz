@@ -7,7 +7,6 @@ import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
 import { ActionBoxAction, UXActionTypes, UXContext } from '../../context/UXContext'
-import { replaceMentions } from '../common/MentionItem'
 
 const CommentDisplayContainer = styled.div`
     display: flex;
@@ -49,11 +48,6 @@ const CommentDisplay = (props: CommentDisplayProps) => {
     const { data: commentTreeData } = trpc.useQuery(['comment:getTreeByCommentId', { commentId: props.commentId }])
     const mutationDeleteComment = trpc.useMutation(['admin:deleteCommentById'])
     const mutationSoftDeleteComment = trpc.useMutation(['admin:softDeleteCommentById'])
-
-    useEffect(() => {
-        const doc = contentRender?.current as unknown as HTMLElement
-        replaceMentions(doc)
-    }, [commentTreeData])
 
     const handleReplyComment = (data: any) => {
         dispatch({
