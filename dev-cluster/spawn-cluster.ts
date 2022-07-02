@@ -59,8 +59,14 @@ export const spawnCluster = (args, cbk) => {
                         const nodes = chunk(findPorts, portsPerLnd, count(args.size))
 
                         return await asyncMap(nodes, async (ports) => {
-                            const [chainP2pPort, chainRpcPort, chainZmqBlockPort, chainZmqTxPort, lightningP2pPort, lightningRpcPort] =
-                                ports
+                            const [
+                                chainP2pPort,
+                                chainRpcPort,
+                                chainZmqBlockPort,
+                                chainZmqTxPort,
+                                lightningP2pPort,
+                                lightningRpcPort,
+                            ] = ports
 
                             const lightningDocker = await spawnLightningDocker({
                                 chain_p2p_port: chainP2pPort,

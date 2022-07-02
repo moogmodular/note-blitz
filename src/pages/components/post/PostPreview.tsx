@@ -1,8 +1,7 @@
 import { format } from 'date-fns'
-import React, { useContext } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { UXContext } from '../../context/UXContext'
 import TagDisplayPill from '../common/TagDisplayPill'
 
 const PostBox = styled.div`

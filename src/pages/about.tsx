@@ -7,7 +7,6 @@ export default function AboutPage() {
     const [balance, setBalance] = useState<number>()
 
     const { client } = trpc.useContext()
-    
 
     useEffect(() => {
         const doInit = async () => {
