@@ -38,15 +38,15 @@ const IsolatedPost = (props: IsolatedPostProps) => {
         mutationSoftDeletePost.mutate({ posyId: postId })
     }
 
-    const handleClose = () => {
-        router.push('/')
+    const handleClose = async () => {
+        await router.push('/')
     }
 
     return (
         <IsolatedPostPropsContainer>
             {postData ? (
                 <FullPost
-                    postId={postData.id}
+                    postId={postData?.id!}
                     handleClose={handleClose}
                     handleDeletePost={handleDeletePost}
                     handleSoftDeletePost={handleSoftDeletePost}
