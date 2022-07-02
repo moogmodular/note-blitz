@@ -209,18 +209,20 @@ const FullPost = (props: FullPostProps) => {
                 </PostingFooter>
 
                 <hr />
-                {commentData?.map((comment) => {
-                    return (
-                        <CommentDisplay
-                            key={comment.id}
-                            depth={0}
-                            author={comment.author}
-                            content={comment.content}
-                            commentId={comment.id}
-                            title={comment.title}
-                        />
-                    )
-                })}
+                <div ref={parent}>
+                    {commentData?.map((comment) => {
+                        return (
+                            <CommentDisplay
+                                key={comment.id}
+                                depth={0}
+                                author={comment.author}
+                                content={comment.content}
+                                commentId={comment.id}
+                                title={comment.title}
+                            />
+                        )
+                    })}
+                </div>
             </PostBoxContent>
         </PostBox>
     )
