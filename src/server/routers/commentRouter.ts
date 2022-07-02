@@ -49,7 +49,7 @@ export const commentRouter = createRouter()
             commentId: z.string(),
         }),
         resolve: async ({ ctx, input }) => {
-            const lookup = async (comment: any): Promise<Comment & { children: Comment[]; author: User }> => {
+            const lookup = async (comment: any): Promise<any> => {
                 const children = await ctx.prisma.comment.findMany({
                     where: { parentId: comment.id },
                     include: { author: true },

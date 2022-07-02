@@ -63,8 +63,8 @@ export interface NewCommentProps {
 }
 
 const NewComment = (props: NewCommentProps) => {
-    const { state, dispatch } = useContext(UXContext)
-    const { handleSubmit, control } = useForm()
+    const { state } = useContext(UXContext)
+    const { handleSubmit, control } = useForm<{ title: string; content: string }>()
     const [contentState, setContentState] = useState<{ editorDelta: any; editorHtml: string }>({
         editorDelta: {},
         editorHtml: '',

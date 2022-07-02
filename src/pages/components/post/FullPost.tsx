@@ -5,6 +5,7 @@ import { Outbound } from '@styled-icons/material-outlined/Outbound'
 import { format } from 'date-fns'
 import parse, { DOMNode, HTMLReactParserOptions } from 'html-react-parser'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
 import React, { useContext, useEffect, useRef } from 'react'
 import styled from 'styled-components'
@@ -103,8 +104,8 @@ export interface FullPostProps {
 }
 
 const FullPost = (props: FullPostProps) => {
-    const { state, dispatch } = useContext(UXContext)
-    const { data: session, status } = useSession()
+    const { dispatch } = useContext(UXContext)
+    const { data: session } = useSession()
 
     const parent = useRef(null)
 
@@ -155,78 +156,91 @@ const FullPost = (props: FullPostProps) => {
     return (
         <PostBox>
             <PostBoxContent>
-                <FullPostHeader>
-                    <img src={postData?.headerImage} alt="header image" width={'250px'} height={'250px'} />
-                    <FullPostHeaderTextContent>
-                        <HeaderTitleContainer>
-                            <h2>{postData?.title}</h2>
-                            <ButtonOutContainer>
-                                {session?.user?.role === 'ADMIN' ? (
-                                    <>
-                                        <StyledButton onClick={() => props.handleSoftDeletePost(props.postId)}>
-                                            SDelete
-                                        </StyledButton>
-                                        <StyledButton onClick={() => props.handleDeletePost(props.postId)}>
-                                            Delete
-                                        </StyledButton>
-                                    </>
-                                ) : null}
-                                <StyledButton onClick={() => props.handleClose()}>Close</StyledButton>
-                                <Link href={`/post/single/${postData?.slug}`}>
-                                    <SmallOutbound />
-                                </Link>
-                            </ButtonOutContainer>
-                        </HeaderTitleContainer>
-                        <p>{postData?.excerpt}</p>
-                        <PostHeaderFooter>
-                            <p>
-                                written by: <TagDisplayPill tagValue={postData?.author.userName} tagType={'@'} />
-                            </p>
-                            {postData?.createdAt && <p>{format(new Date(postData?.createdAt), 'dd.MM.yyyy')}</p>}
-                        </PostHeaderFooter>
-                    </FullPostHeaderTextContent>
-                </FullPostHeader>
-                <TypographyStylesProvider style={{ fontStyle: 'Courier' }}>
-                    {postData ? parser(postData?.content.htmlContent as string) : null}
-                </TypographyStylesProvider>
-                <PostingFooter>
-                    <PostingFooterLeft>
-                        <PillListInFooter>
-                            {postData?.tags?.map((tag) => {
-                                return (
-                                    <TagDisplayPill
-                                        key={tag.tagId}
-                                        tagValue={tag.tag.name}
-                                        tagType={'#'}
-                                        withBackground={true}
-                                    />
-                                )
-                            })}
-                        </PillListInFooter>
-                    </PostingFooterLeft>
-                    <ButtonRow>
-                        {session?.user.userName === postData?.author?.userName ? (
-                            <StyledButton onClick={() => handleEditPost(postData?.id)}>Edit</StyledButton>
-                        ) : null}
-                        <StyledButton onClick={() => handleReplyPost(postData?.id)}>Reply</StyledButton>
-                    </ButtonRow>
-                </PostingFooter>
-
-                <hr />
-                <div ref={parent}>
-                    {commentData?.map((comment) => {
-                        return (
-                            <CommentDisplay
-                                key={comment.id}
-                                depth={0}
-                                author={comment.author}
-                                content={comment.content}
-                                commentId={comment.id}
-                                title={comment.title}
+                {postData ? (
+                    <>
+                        <FullPostHeader>
+                            <Image
+                                src={postData.headerImage as string}
+                                alt="header image"
+                                width={'250px'}
+                                height={'250px'}
                             />
-                        )
-                    })}
-                </div>
+                            <FullPostHeaderTextContent>
+                                <HeaderTitleContainer>
+                                    <h2>{postData.title}</h2>
+                                    <ButtonOutContainer>
+                                        {session && session.user.role === 'ADMIN' ? (
+                                            <>
+                                                <StyledButton onClick={() => props.handleSoftDeletePost(props.postId)}>
+                                                    SDelete
+                                                </StyledButton>
+                                                <StyledButton onClick={() => props.handleDeletePost(props.postId)}>
+                                                    Delete
+                                                </StyledButton>
+                                            </>
+                                        ) : null}
+                                        <StyledButton onClick={() => props.handleClose()}>Close</StyledButton>
+                                        <Link href={`/post/single/${postData.slug}`}>
+                                            <SmallOutbound />
+                                        </Link>
+                                    </ButtonOutContainer>
+                                </HeaderTitleContainer>
+                                <p>{postData.excerpt}</p>
+                                <PostHeaderFooter>
+                                    <p>
+                                        written by:
+                                        <TagDisplayPill tagValue={postData?.author?.userName as string} tagType={'@'} />
+                                    </p>
+                                    {postData.createdAt && <p>{format(new Date(postData.createdAt), 'dd.MM.yyyy')}</p>}
+                                </PostHeaderFooter>
+                            </FullPostHeaderTextContent>
+                        </FullPostHeader>
+                        <TypographyStylesProvider style={{ fontStyle: 'Courier' }}>
+                            {parser(postData.content.htmlContent as string)}
+                        </TypographyStylesProvider>
+                        <PostingFooter>
+                            <PostingFooterLeft>
+                                <PillListInFooter>
+                                    {postData?.tags?.map((tag) => {
+                                        return (
+                                            <TagDisplayPill
+                                                key={tag.tagId}
+                                                tagValue={tag.tag.name}
+                                                tagType={'#'}
+                                                withBackground={true}
+                                            />
+                                        )
+                                    })}
+                                </PillListInFooter>
+                            </PostingFooterLeft>
+                            <ButtonRow>
+                                {session?.user.userName === postData?.author?.userName ? (
+                                    <StyledButton onClick={() => handleEditPost(postData.id)}>Edit</StyledButton>
+                                ) : null}
+                                <StyledButton onClick={() => handleReplyPost(postData.id)}>Reply</StyledButton>
+                            </ButtonRow>
+                        </PostingFooter>
+
+                        <hr />
+                        <div ref={parent}>
+                            {commentData &&
+                                commentData.map((comment) => {
+                                    const author = comment.author as { userName?: string | undefined }
+                                    const content = comment.content as { htmlContent?: string | undefined }
+                                    return (
+                                        <CommentDisplay
+                                            key={comment.id}
+                                            depth={0}
+                                            author={author}
+                                            content={content}
+                                            commentId={comment.id}
+                                            title={comment.title}
+                                        />
+                                    )
+                                })}
+                        </div>
+                    </>
+                ) : null}
             </PostBoxContent>
         </PostBox>
     )

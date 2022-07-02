@@ -1,5 +1,6 @@
 import { TypographyStylesProvider } from '@mantine/core'
 import { Button } from '@mui/material'
+import { Comment } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import React, { useContext, useEffect, useRef } from 'react'
 import styled from 'styled-components'
@@ -99,13 +100,14 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                     </CommentFooter>
                     <hr />
                     {commentTreeData?.children
-                        ? commentTreeData.children.map((child) => {
+                        ? commentTreeData.children.map((child: Comment & { author: Record<string, any> }) => {
+                              const content = child.content as { htmlContent: string }
                               return (
                                   <CommentDisplay
                                       key={child.id}
                                       depth={props.depth + 1}
                                       author={child.author}
-                                      content={child.content}
+                                      content={content}
                                       commentId={child.id}
                                       title={child.title}
                                   />

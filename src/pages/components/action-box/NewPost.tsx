@@ -79,7 +79,7 @@ export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) =>
 )
 
 const NewPost = (props: NewPostProps) => {
-    const { handleSubmit, control } = useForm()
+    const { handleSubmit, control } = useForm<{ title: string; excerpt: string }>()
     const [image, setImage] = useState('')
 
     const theme = useMantineTheme()
