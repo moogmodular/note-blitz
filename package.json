@@ -38,7 +38,7 @@
         "@mantine/hooks": "^4.2.10",
         "@mantine/next": "^4.2.10",
         "@mantine/rte": "^4.2.10",
-        "@mui/material": "^5.8.2",
+        "@mui/material": "^5.8.6",
         "@prisma/client": "^4.0.0",
         "@trpc/client": "^9.25.3",
         "@trpc/next": "^9.25.3",
