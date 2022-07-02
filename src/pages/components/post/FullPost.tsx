@@ -1,3 +1,4 @@
+import autoAnimate from '@formkit/auto-animate'
 import { TypographyStylesProvider } from '@mantine/core'
 import { Button } from '@mui/material'
 import { Outbound } from '@styled-icons/material-outlined/Outbound'
@@ -5,7 +6,7 @@ import { format } from 'date-fns'
 import parse, { DOMNode, HTMLReactParserOptions } from 'html-react-parser'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
@@ -105,6 +106,12 @@ const FullPost = (props: FullPostProps) => {
     const { state, dispatch } = useContext(UXContext)
     const { data: session, status } = useSession()
 
+    const parent = useRef(null)
+
+    useEffect(() => {
+        parent.current && autoAnimate(parent.current)
+    }, [parent])
+
     const { data: postData } = trpc.useQuery(['post:getPostById', { postId: props.postId }])
     const { data: commentData } = trpc.useQuery(['comment:getForPostById', { postId: props.postId }])
 
@@ -139,8 +146,6 @@ const FullPost = (props: FullPostProps) => {
                 }
             },
         }
-
-        console.log(input)
 
         if (input) {
             return parse(input, options)
@@ -184,7 +189,6 @@ const FullPost = (props: FullPostProps) => {
                 <TypographyStylesProvider style={{ fontStyle: 'Courier' }}>
                     {postData ? parser(postData?.content.htmlContent as string) : null}
                 </TypographyStylesProvider>
-                <hr />
                 <PostingFooter>
                     <PostingFooterLeft>
                         <PillListInFooter>

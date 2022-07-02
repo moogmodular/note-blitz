@@ -37,12 +37,13 @@ const MainContainer = styled.div`
     padding: 2em;
     display: flex;
     flex-direction: row;
-    gap: 2em;
+    gap: 1em;
     height: 100vh;
 `
 
 const LeftRow = styled.div`
     display: flex;
+    gap: 1em;
     flex-direction: column;
     width: 66vw;
 `
@@ -50,6 +51,7 @@ const LeftRow = styled.div`
 const RightRow = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 1em;
     width: 30vw;
     justify-content: space-between;
 `
@@ -68,7 +70,6 @@ export default function IndexPage() {
         if (!subPath) {
             return 'timeline'
         }
-        console.log(subPath)
         return path.split('/')[2]
     }
 

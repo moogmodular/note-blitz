@@ -12,8 +12,8 @@ import UserList from './UserList'
 const SiteMetaPropsContainer = styled.div`
     border: 3px solid #000;
     padding: 1rem;
-    margin-bottom: 1rem;
     min-height: 20vh;
+    font-size: 0.8rem;
 `
 
 /* eslint-disable-next-line */

@@ -53,7 +53,6 @@ const HeaderContainer = styled.div`
     display: flex;
     justify-content: space-between;
     padding: 0.7em;
-    margin-bottom: 2em;
 `
 
 const LogoContainer = styled.div`
