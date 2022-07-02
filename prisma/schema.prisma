@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model LnAuth {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  k1        String   @unique
+  publicKey String?
+  used      Boolean?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                       String                     @id @default(uuid())
+  role                     Role                       @default(USER)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  lastLogin                DateTime?
+  publicKey                String                     @unique
+  userName                 String                     @unique
+  profileImage             String?
+  bio                      String?
+  comments                 Comment[]
+  lnAuth                   LnAuth[]
+  MentionedUsersOnComments MentionedUsersOnComments[]
+  MentionedUsersOnPosts    MentionedUsersOnPosts[]
+  posts                    Post[]
+}
+
+enum Role {
+  USER
+  JANITOR
+  ADMIN
+}
+
+model Post {
+  id             String                  @id @default(uuid())
+  contentStatus  ContentStatus           @default(PUBLISHED)
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+  content        Json
+  title          String
+  slug           String                  @unique
+  excerpt        String
+  authorId       String
+  headerImage    String
+  author         User                    @relation(fields: [authorId], references: [id])
+  comments       Comment[]
+  mentionedUsers MentionedUsersOnPosts[]
+  tags           TagsOnPosts[]
+}
+
+model Comment {
+  id             String                     @id @default(uuid())
+  contentStatus  ContentStatus              @default(PUBLISHED)
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  content        Json
+  title          String
+  postId         String
+  parentId       String?
+  authorId       String?
+  author         User?                      @relation(fields: [authorId], references: [id])
+  parent         Comment?                   @relation("ParentCommentToChildren", fields: [parentId], references: [id])
+  post           Post                       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  children       Comment[]                  @relation("ParentCommentToChildren")
+  mentionedUsers MentionedUsersOnComments[]
+  tags           TagsOnComments[]
+}
+
+enum ContentStatus {
+  PUBLISHED
+  SOFT_DELETED
+}
+
+model Tag {
+  id             String           @id @default(uuid())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  name           String           @unique
+  TagsOnComments TagsOnComments[]
+  posts          TagsOnPosts[]
+}
+
+model MentionedUsersOnComments {
+  commentId String
+  userId    String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([commentId, userId])
+}
+
+model TagsOnComments {
+  commentId String
+  tagId     String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([commentId, tagId])
+}
+
+model MentionedUsersOnPosts {
+  postId String
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+}
+
+model TagsOnPosts {
+  postId String
+  tagId  String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model lnurl_migrations {
+  id             Int       @id @default(autoincrement())
+  name           String?   @db.VarChar(255)
+  batch          Int?
+  migration_time DateTime? @db.Timestamptz(6)
+}
+
+model lnurl_migrations_lock {
+  index     Int  @id @default(autoincrement())
+  is_locked Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model urls {
+  hash          String?   @unique(map: "urls_hash_unique") @db.VarChar(255)
+  initialUses   Int?      @default(1)
+  remainingUses Int?      @default(0)
+  tag           String?   @db.VarChar(255)
+  params        Json?     @db.Json
+  apiKeyId      String?   @db.VarChar(255)
+  createdAt     DateTime? @db.Timestamptz(6)
+  updatedAt     DateTime? @db.Timestamptz(6)
+
+  @@ignore
+}
