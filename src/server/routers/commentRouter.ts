@@ -1,6 +1,6 @@
 import { clearInterval } from 'timers'
 
-import { Comment, Prisma, User } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { Subscription, TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
@@ -88,8 +88,6 @@ export const commentRouter = createRouter()
         resolve: async ({ input, ctx }) => {
             if (!ctx?.user?.id) {
                 throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return
             }
 
             const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)
@@ -153,8 +151,6 @@ export const commentRouter = createRouter()
         resolve: async ({ input, ctx }) => {
             if (!ctx?.user?.id) {
                 throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return
             }
 
             const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)

@@ -39,8 +39,6 @@ export const postRouter = createRouter()
         resolve: async ({ input, ctx }) => {
             if (!ctx?.user?.id) {
                 throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return []
             }
 
             const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)
@@ -102,7 +100,14 @@ export const postRouter = createRouter()
                     slug: input.slug,
                 },
             })
-            return post
+            const content = post!.content as Prisma.JsonObject
+            return {
+                ...post,
+                content: {
+                    htmlContent: post!.contentStatus === 'SOFT_DELETED' ? '<div>DELETED</div>' : content.htmlContent,
+                    deltaContent: post!.contentStatus === 'SOFT_DELETED' ? {} : content.deltaContent,
+                },
+            }
         },
     })
     .query('getPostById', {
@@ -215,8 +220,6 @@ export const postRouter = createRouter()
         resolve: async ({ ctx }) => {
             if (!ctx?.user?.id) {
                 throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return []
             }
             return await ctx.prisma.post.findMany({
                 where: {
