@@ -81,6 +81,7 @@ const EditUser = (props: EditUserProps) => {
 
     const mutationEditUser = trpc.useMutation(['user:edit'])
     const { data: meUserData } = trpc.useQuery(['user:getMe'])
+    const utils = trpc.useContext()
 
     useEffect(() => {
         setImage(meUserData?.profileImage as string)
@@ -90,7 +91,8 @@ const EditUser = (props: EditUserProps) => {
     }, [])
 
     const onSubmit = async (data: { userName?: string; bio?: string }) => {
-        mutationEditUser.mutate({ userName: data.userName, profileImage: image, bio: data.bio })
+        await mutationEditUser.mutateAsync({ userName: data.userName, profileImage: image, bio: data.bio })
+        await utils.invalidateQueries(['user:getMe'])
     }
 
     const resizeFile = (file: any) =>

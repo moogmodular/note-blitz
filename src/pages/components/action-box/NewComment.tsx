@@ -81,17 +81,19 @@ const NewComment = (props: NewCommentProps) => {
 
     const onSubmit = async (data: { title: string; content: string }) => {
         if (state.actionBoxState.actionBoxAction === ActionBoxAction.doReplyToPost) {
-            await mutationReplyToPost.mutate({
+            await mutationReplyToPost.mutateAsync({
                 title: data.title,
                 content: { deltaContent: contentState.editorDelta, htmlContent: contentState.editorHtml },
                 postId: props.data!,
             })
+            await utils.invalidateQueries(['comment:getForPostById'])
         } else if (state.actionBoxState.actionBoxAction === ActionBoxAction.doReplyToComment) {
-            await mutationReplyToComment.mutate({
+            await mutationReplyToComment.mutateAsync({
                 title: data.title,
                 content: { deltaContent: contentState.editorDelta, htmlContent: contentState.editorHtml },
                 commentId: props.data!,
             })
+            await utils.invalidateQueries(['comment:getTreeByCommentId'])
         }
     }
 

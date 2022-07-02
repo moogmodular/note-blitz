@@ -79,7 +79,6 @@ export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) =>
 )
 
 const NewPost = (props: NewPostProps) => {
-    const { state, dispatch } = useContext(UXContext)
     const { handleSubmit, control } = useForm()
     const [image, setImage] = useState('')
 
@@ -120,7 +119,7 @@ const NewPost = (props: NewPostProps) => {
     }
 
     const onSubmit = async (data: { title: string; excerpt: string }) => {
-        mutationCreate.mutate({
+        await mutationCreate.mutateAsync({
             ...data,
             headerImage: image,
             content: { deltaContent: contentState.editorDelta, htmlContent: contentState.editorHtml },
