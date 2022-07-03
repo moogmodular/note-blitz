@@ -62,7 +62,9 @@ const Authenticate = (props: AuthenticateProps) => {
                     return 1000
                 }
                 setLoginUrl({ secret: '', encoded: '' })
-                void signIn('credentials', { k1: data, callbackUrl: '/', redirect: true })
+                setTimeout(() => {
+                    void signIn('credentials', { k1: data, callbackUrl: '/', redirect: true })
+                }, 3000)
                 return false
             }
             return false
