@@ -52,7 +52,7 @@
         "lightning": "^5.16.2",
         "lnurl": "^0.24.1",
         "next": "^12.1.6",
-        "next-auth": "^4.2.0",
+        "next-auth": "^4.8.0",
         "node-fetch": "^2.6.1",
         "pg": "^8.7.3",
         "qrcode.react": "^3.1.0",
