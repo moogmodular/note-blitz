@@ -1,16 +1,11 @@
 // Prisma adapter for NextAuth, optional and can be removed
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { User } from '@prisma/client'
-import NextAuth, { NextAuthOptions } from 'next-auth'
+import {PrismaAdapter} from '@next-auth/prisma-adapter'
+import {User} from '@prisma/client'
+import NextAuth, {NextAuthOptions} from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { Config, adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
+import {adjectives, animals, colors, Config, uniqueNamesGenerator} from 'unique-names-generator'
 
-import { prisma } from '../../../server/db/client'
-
-const mapUser = (user?: User | null) => {
-    console.log(user)
-    return { ...user, profileImage: '' }
-}
+import {prisma} from '../../../server/db/client'
 
 export const authOptions: NextAuthOptions = {
     callbacks: {
@@ -52,7 +47,7 @@ export const authOptions: NextAuthOptions = {
                             user = await prisma.user.create({ data: { userName: randomName, publicKey: pubkey } })
                         }
                         await prisma.lnAuth.delete({ where: { k1 } })
-                        console.log('user', user)
+                        user.profileImage = ''
                         return user
                     }
                 } catch (error) {
