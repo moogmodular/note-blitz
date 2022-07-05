@@ -67,7 +67,7 @@ const PostPreview = (props: PostPreviewProps) => {
                 <PostingFooter>
                     <PostingFooterLeft>
                         <PillListInFooter>
-                            {props.tags.map((tag) => {
+                            {props.tags?.map((tag) => {
                                 return (
                                     <TagDisplayPill
                                         key={tag.tagId}
@@ -82,7 +82,7 @@ const PostPreview = (props: PostPreviewProps) => {
                             <b>
                                 by: <TagDisplayPill tagValue={props.author} tagType={'@'} />
                             </b>
-                            <b>created: {format(props.createdAt, 'dd.MM.yyyy')}</b>
+                            <b>created: {format(props.createdAt ?? new Date(), 'dd.MM.yyyy')}</b>
                             <b>{props.commentAmount} comments</b>
                         </div>
                     </PostingFooterLeft>

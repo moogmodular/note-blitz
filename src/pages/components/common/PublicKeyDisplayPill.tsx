@@ -9,11 +9,11 @@ const Pill = styled.div`
 
 /* eslint-disable-next-line */
 export interface PublicKeyDisplayPillProps {
-    publicKey: string
+    publicKey?: string
 }
 
 const PublicKeyDisplayPill = (props: PublicKeyDisplayPillProps) => {
-    const displayKey = props.publicKey.substring(0, 8) + '...'
+    const displayKey = props.publicKey?.substring(0, 8) + '...'
 
     // a method that returns a color based on a string
     const getColor = (str: string) => {
@@ -23,7 +23,7 @@ const PublicKeyDisplayPill = (props: PublicKeyDisplayPillProps) => {
         return `hsl(${hash % 360}, 80%, 50%)`
     }
 
-    return <Pill style={{ backgroundColor: getColor(props.publicKey) }}>{displayKey}</Pill>
+    return <Pill style={{ backgroundColor: getColor(props.publicKey ?? '') }}>{displayKey}</Pill>
 }
 
 export default PublicKeyDisplayPill

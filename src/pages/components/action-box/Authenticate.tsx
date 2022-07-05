@@ -51,25 +51,23 @@ export interface AuthenticateProps {}
 const Authenticate = (props: AuthenticateProps) => {
     const { data: session, status } = useSession()
 
-    const [loginUrl, setLoginUrl] = useState<{ encoded: string; secret: string }>({ encoded: '', secret: '' })
+    const [loginUrl, setLoginUrl] = useState<{ secret: string; encoded: string }>({ secret: '', encoded: '' })
     const [showCopied, setShowCopied] = useState(false)
     const parent = useRef(null)
 
     const isSecretLoggedIn = trpc.useQuery(['auth:isSecretLoggedIn', { secret: loginUrl.secret }], {
         refetchInterval: (data) => {
             if (!session?.user) {
-                if (!data) {
+                if (!data?.pubkey) {
                     return 1000
                 }
                 setLoginUrl({ secret: '', encoded: '' })
-                setTimeout(() => {
-                    void signIn('credentials', { k1: data, callbackUrl: '/', redirect: true })
-                }, 3000)
-                return false
+                void signIn('credentials', { k1: data.k1, pubkey: data.pubkey, callbackUrl: '/', redirect: true })
             }
             return false
         },
     })
+
     const getLoginUrl = trpc.useQuery(['auth:getLoginUrl'], {
         onSuccess: (data) => {
             setLoginUrl(data)

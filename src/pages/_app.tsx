@@ -1,74 +1,50 @@
-import '../../styles/global.css'
+import '../styles/globals.css'
 
-import { httpBatchLink } from '@trpc/client/links/httpBatchLink'
-import { loggerLink } from '@trpc/client/links/loggerLink'
-import { createWSClient, wsLink } from '@trpc/client/links/wsLink'
+// src/pages/_app.tsx
 import { withTRPC } from '@trpc/next'
-import { SessionProvider, getSession } from 'next-auth/react'
-import getConfig from 'next/config'
-import { AppType } from 'next/dist/shared/lib/utils'
-import type { AppRouter } from 'server/routers/_app'
+import { SessionProvider } from 'next-auth/react'
+import type { AppType } from 'next/dist/shared/lib/utils'
 import superjson from 'superjson'
 
-const { publicRuntimeConfig } = getConfig()
+import type { AppRouter } from '../server/router'
 
-const { APP_URL, WS_URL } = publicRuntimeConfig
-
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
     return (
-        <SessionProvider session={pageProps.session}>
+        <SessionProvider session={session}>
             <Component {...pageProps} />
         </SessionProvider>
     )
 }
 
-MyApp.getInitialProps = async ({ ctx }) => {
-    return {
-        pageProps: {
-            session: await getSession(ctx),
-        },
+const getBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+        return ''
     }
-}
+    if (process.browser) return '' // Browser should use current path
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // SSR should use vercel url
 
-export function getEndingLink() {
-    if (typeof window === 'undefined') {
-        return httpBatchLink({
-            url: `${APP_URL}/api/trpc`,
-        })
-    }
-    const client = createWSClient({
-        url: WS_URL,
-    })
-    return wsLink<AppRouter>({
-        client,
-    })
+    return `http://localhost:${process.env.PORT ?? 3000}` // dev SSR should use localhost
 }
 
 export default withTRPC<AppRouter>({
     config({ ctx }) {
+        /**
+         * If you want to use SSR, you need to use the server's full URL
+         * @link https://trpc.io/docs/ssr
+         */
+        const url = `${getBaseUrl()}/api/trpc`
+
         return {
-            links: [
-                // adds pretty logs to your console in development and logs errors in production
-                loggerLink({
-                    enabled: (opts) =>
-                        (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') ||
-                        (opts.direction === 'down' && opts.result instanceof Error),
-                }),
-                getEndingLink(),
-            ],
+            url,
             transformer: superjson,
-            queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
-            headers: () => {
-                if (ctx?.req) {
-                    // on ssr, forward client's headers to the server
-                    return {
-                        ...ctx.req.headers,
-                        'x-ssr': '1',
-                    }
-                }
-                return {}
-            },
+            /**
+             * @link https://react-query.tanstack.com/reference/QueryClient
+             */
+            // queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
         }
     },
-    ssr: true,
+    /**
+     * @link https://trpc.io/docs/ssr
+     */
+    ssr: false,
 })(MyApp)

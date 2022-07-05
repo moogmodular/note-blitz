@@ -92,11 +92,18 @@ const Header = (props: HeaderProps) => {
     })
 
     useEffect(() => {
-        if (!session) {
+        if (!session?.user) {
             uxDispatch({
                 type: UXActionTypes.SetActionBox,
                 payload: {
                     actionBoxAction: ActionBoxAction.doAuth,
+                },
+            })
+        } else {
+            uxDispatch({
+                type: UXActionTypes.SetActionBox,
+                payload: {
+                    actionBoxAction: ActionBoxAction.doNewPost,
                 },
             })
         }
@@ -116,15 +123,6 @@ const Header = (props: HeaderProps) => {
             type: UXActionTypes.SetActionBox,
             payload: {
                 actionBoxAction: ActionBoxAction.doSiteInfo,
-            },
-        })
-    }
-
-    const handleAuthClick = () => {
-        uxDispatch({
-            type: UXActionTypes.SetActionBox,
-            payload: {
-                actionBoxAction: ActionBoxAction.doAuth,
             },
         })
     }

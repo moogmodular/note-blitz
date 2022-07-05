@@ -2,13 +2,12 @@ import { Group, MantineTheme, Text, useMantineTheme } from '@mantine/core'
 import { Dropzone, DropzoneStatus, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { Button, TextField } from '@mui/material'
 import { DeltaStatic } from 'quill'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import Resizer from 'react-image-file-resizer'
 import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
-import { UXContext } from '../../context/UXContext'
 import ContentEditor from '../editor/ContentEditor'
 
 const NewPostContainer = styled.div`
@@ -79,7 +78,7 @@ export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) =>
 )
 
 const NewPost = (props: NewPostProps) => {
-    const { handleSubmit, control } = useForm<{ title: string; excerpt: string }>()
+    const { handleSubmit, control, setValue } = useForm<{ title: string; excerpt: string }>()
     const [image, setImage] = useState('')
 
     const theme = useMantineTheme()
@@ -123,6 +122,13 @@ const NewPost = (props: NewPostProps) => {
             ...data,
             headerImage: image,
             content: { deltaContent: contentState.editorDelta, htmlContent: contentState.editorHtml },
+        })
+        setValue('title', '')
+        setValue('excerpt', '')
+        void setImage('image as string')
+        setContentState({
+            editorDelta: {},
+            editorHtml: '',
         })
         await utils.invalidateQueries(['post:getAll'])
     }
