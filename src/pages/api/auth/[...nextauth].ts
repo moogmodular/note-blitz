@@ -1,38 +1,70 @@
-import NextAuth from 'next-auth'
-import { AppProviders } from 'next-auth/providers'
+// Prisma adapter for NextAuth, optional and can be removed
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { User } from '@prisma/client'
+import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { Config, adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
 
-import { prisma } from '../../../server/context'
+import { prisma } from '../../../server/db/client'
 
-const providers: AppProviders = []
-providers.push(
-    CredentialsProvider({
-        name: 'Lightning',
-        credentials: {
-            k1: { label: 'secret', type: 'text' },
-        },
-        async authorize(credentials, req) {
-            try {
-                const lnAuth = await prisma.lnAuth.findUnique({
-                    where: { k1: credentials!.k1 },
-                    include: { user: true },
-                })
-                const user = lnAuth!.user
-                return {
-                    id: user!.id,
-                    role: user!.role,
-                    lastLogin: user!.lastLogin,
-                    publicKey: user!.publicKey,
-                    userName: user!.userName,
-                }
-            } catch (error) {
-                console.log(error)
+const mapUser = (user?: User | null) => {
+    console.log(user)
+    return { ...user, profileImage: '' }
+}
+
+export const authOptions: NextAuthOptions = {
+    callbacks: {
+        async jwt({ token, user, account, profile, isNewUser }) {
+            if (user?.id) {
+                token.user = user
             }
-            return null
+            return token
         },
-    }),
-)
-export default NextAuth({
+        async session({ session, token }) {
+            // session.user.id = token.id
+            // @ts-ignore
+            session.user = token.user as User
+            return session
+        },
+    },
+    providers: [
+        CredentialsProvider({
+            name: 'credentials',
+            credentials: {
+                pubkey: { label: 'publickey', type: 'text' },
+                k1: { label: 'k1', type: 'text' },
+            },
+            async authorize(credentials, req) {
+                const k1 = credentials?.k1
+                const pubkey = credentials?.pubkey
+                try {
+                    const lnAuth = await prisma.lnAuth.findUnique({ where: { k1 } })
+                    if (lnAuth!.pubkey === pubkey) {
+                        let user = await prisma.user.findUnique({ where: { publicKey: pubkey } })
+                        if (!user) {
+                            const customConfig: Config = {
+                                dictionaries: [adjectives, colors, animals],
+                                separator: '',
+                                length: 3,
+                                style: 'capital',
+                            }
+                            const randomName: string = uniqueNamesGenerator(customConfig)
+                            user = await prisma.user.create({ data: { userName: randomName, publicKey: pubkey } })
+                        }
+                        await prisma.lnAuth.delete({ where: { k1 } })
+                        console.log('user', user)
+                        return user
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+
+                return null
+            },
+        }),
+    ],
+    adapter: PrismaAdapter(prisma),
+    secret: process.env.NEXTAUTH_SECRET,
     session: {
         strategy: 'jwt',
         maxAge: 3 * 24 * 60 * 60,
@@ -41,18 +73,9 @@ export default NextAuth({
         secret: process.env.NEXTAUTH_SECRET,
         maxAge: 3 * 24 * 60 * 60,
     },
-    callbacks: {
-        async jwt({ token, user, account, profile, isNewUser }) {
-            if (user) {
-                token.user = user
-            }
-            return token
-        },
-        async session({ session, user, token }) {
-            // @ts-ignore
-            session.user = token.user
-            return session
-        },
+    pages: {
+        signIn: '/login',
     },
-    providers,
-})
+}
+
+export default NextAuth(authOptions)
