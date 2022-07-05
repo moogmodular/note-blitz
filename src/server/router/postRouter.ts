@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { slugify } from '../../utils/string.service'
 import { extractMentionsFromDelta } from '../../utils/taxonomy.service'
-import { createRouter } from '../createRouter'
+import { createRouter } from './context'
 
 const postMapper = (posts: any) =>
     posts.map((post: any) => {
@@ -26,70 +26,6 @@ const postMapper = (posts: any) =>
     })
 
 export const postRouter = createRouter()
-    .mutation('create', {
-        input: z.object({
-            title: z.string(),
-            headerImage: z.string(),
-            excerpt: z.string(),
-            content: z.object({
-                htmlContent: z.string(),
-                deltaContent: z.any(),
-            }),
-        }),
-        resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id) {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-            }
-
-            const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)
-
-            const allNewTags = await Promise.all(
-                mentionedTags.map(async (tag) => {
-                    const existingTag = await ctx.prisma.tag.findUnique({ where: { name: tag.value } })
-
-                    if (existingTag) {
-                        return existingTag
-                    }
-                    return await ctx.prisma.tag.create({ data: { name: tag.value } })
-                }),
-            )
-
-            const allMentionedUsers = await Promise.all(
-                mentionedUsers.map(async (user) => {
-                    return await ctx.prisma.user.findUnique({ where: { userName: user.value } })
-                }),
-            )
-
-            return await ctx.prisma.post.create({
-                data: {
-                    authorId: ctx.user.id as string,
-                    headerImage: input.headerImage,
-                    title: input.title,
-                    slug: slugify(input.title),
-                    mentionedUsers: {
-                        createMany: {
-                            data: allMentionedUsers.map((usr) => {
-                                return {
-                                    userId: usr!.id,
-                                }
-                            }),
-                        },
-                    },
-                    tags: {
-                        createMany: {
-                            data: allNewTags.map((tag) => {
-                                return {
-                                    tagId: tag!.id,
-                                }
-                            }),
-                        },
-                    },
-                    excerpt: input.excerpt,
-                    content: { htmlContent: input.content.htmlContent, deltaContent: input.content.deltaContent },
-                },
-            })
-        },
-    })
     .query('getPostBySlug', {
         input: z.object({
             slug: z.string(),
@@ -216,15 +152,78 @@ export const postRouter = createRouter()
             return postMapper(posts)
         },
     })
+    .middleware(async ({ ctx, next }) => {
+        if (!ctx?.user) {
+            throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+        return next()
+    })
+    .mutation('create', {
+        input: z.object({
+            title: z.string(),
+            headerImage: z.string(),
+            excerpt: z.string(),
+            content: z.object({
+                htmlContent: z.string(),
+                deltaContent: z.any(),
+            }),
+        }),
+        resolve: async ({ input, ctx }) => {
+            const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)
+
+            const allNewTags = await Promise.all(
+                mentionedTags.map(async (tag) => {
+                    const existingTag = await ctx.prisma.tag.findUnique({ where: { name: tag.value } })
+
+                    if (existingTag) {
+                        return existingTag
+                    }
+                    return await ctx.prisma.tag.create({ data: { name: tag.value } })
+                }),
+            )
+
+            const allMentionedUsers = await Promise.all(
+                mentionedUsers.map(async (user) => {
+                    return await ctx.prisma.user.findUnique({ where: { userName: user.value } })
+                }),
+            )
+
+            return await ctx.prisma.post.create({
+                data: {
+                    authorId: ctx?.user?.id as string,
+                    headerImage: input.headerImage,
+                    title: input.title,
+                    slug: slugify(input.title),
+                    mentionedUsers: {
+                        createMany: {
+                            data: allMentionedUsers.map((usr) => {
+                                return {
+                                    userId: usr!.id,
+                                }
+                            }),
+                        },
+                    },
+                    tags: {
+                        createMany: {
+                            data: allNewTags.map((tag) => {
+                                return {
+                                    tagId: tag!.id,
+                                }
+                            }),
+                        },
+                    },
+                    excerpt: input.excerpt,
+                    content: { htmlContent: input.content.htmlContent, deltaContent: input.content.deltaContent },
+                },
+            })
+        },
+    })
     .query('getMine', {
         resolve: async ({ ctx }) => {
-            if (!ctx?.user?.id) {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-            }
             return await ctx.prisma.post.findMany({
                 where: {
                     author: {
-                        id: ctx.user.id as string,
+                        id: ctx?.user?.id as string,
                     },
                 },
             })

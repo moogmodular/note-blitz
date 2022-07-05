@@ -1,6 +1,6 @@
 import { getChainBalance, getPeers } from 'lightning'
 
-import { createRouter } from '../createRouter'
+import { createRouter } from './context'
 
 export const lightningRouter = createRouter().query('getNodeBalance', {
     async resolve({ ctx }) {

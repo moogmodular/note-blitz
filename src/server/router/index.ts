@@ -1,10 +1,10 @@
 import superjson from 'superjson'
 
-import { createRouter } from '../createRouter'
 import { adminRouter } from './adminRouter'
 import { apiRouter } from './api'
 import { authRouter } from './authRouter'
 import { commentRouter } from './commentRouter'
+import { createRouter } from './context'
 import { lightningRouter } from './lightningRouter'
 import { postRouter } from './postRouter'
 import { taxonomyRouter } from './taxonomyRouter'
@@ -21,4 +21,5 @@ export const appRouter = createRouter()
     .merge('user:', userRouter)
     .merge(apiRouter)
 
+// export type definition of API
 export type AppRouter = typeof appRouter
