@@ -1,11 +1,9 @@
-import { clearInterval } from 'timers'
-
 import { Prisma } from '@prisma/client'
-import { Subscription, TRPCError } from '@trpc/server'
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
 import { extractMentionsFromDelta } from '../../utils/taxonomy.service'
-import { createRouter } from '../createRouter'
+import { createRouter } from './context'
 
 export const commentRouter = createRouter()
     .query('getForPostById', {
@@ -76,6 +74,12 @@ export const commentRouter = createRouter()
             return await lookup(comment)
         },
     })
+    .middleware(async ({ ctx, next }) => {
+        if (!ctx?.user) {
+            throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+        return next()
+    })
     .mutation('replyToPost', {
         input: z.object({
             postId: z.string(),
@@ -86,10 +90,6 @@ export const commentRouter = createRouter()
             }),
         }),
         resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id) {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-            }
-
             const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)
 
             const allNewTags = await Promise.all(
@@ -113,7 +113,7 @@ export const commentRouter = createRouter()
                 .create({
                     data: {
                         postId: input.postId,
-                        authorId: ctx.user.id,
+                        authorId: ctx?.user?.id,
                         title: input.title,
                         mentionedUsers: {
                             createMany: {
@@ -149,10 +149,6 @@ export const commentRouter = createRouter()
             }),
         }),
         resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id) {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-            }
-
             const { mentionedTags, mentionedUsers } = extractMentionsFromDelta(input.content.deltaContent)
 
             const allNewTags = await Promise.all(
@@ -178,7 +174,7 @@ export const commentRouter = createRouter()
                 .create({
                     data: {
                         parentId: input.commentId,
-                        authorId: ctx.user.id,
+                        authorId: ctx?.user?.id,
                         title: input.title,
                         postId: parentComment!.postId,
                         mentionedUsers: {
@@ -203,20 +199,5 @@ export const commentRouter = createRouter()
                     },
                 })
                 .catch((reason) => console.log(reason))
-        },
-    })
-    .subscription('commentCreatedForPost', {
-        input: z.object({
-            postId: z.string(),
-        }),
-        resolve() {
-            return new Subscription<number>((emit) => {
-                const int = setInterval(() => {
-                    emit.data(Math.random())
-                }, 500)
-                return () => {
-                    clearInterval(int)
-                }
-            })
         },
     })

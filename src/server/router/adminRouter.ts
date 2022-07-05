@@ -1,20 +1,20 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-import { createRouter } from '../createRouter'
+import { createRouter } from './context'
 
 export const adminRouter = createRouter()
+    .middleware(async ({ ctx, next }) => {
+        if (ctx?.user?.role !== 'ADMIN') {
+            throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+        return next()
+    })
     .mutation('softDeleteCommentById', {
         input: z.object({
             commentId: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id || ctx?.user?.role !== 'ADMIN') {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return []
-            }
-
             return await ctx.prisma.comment.update({
                 where: { id: input.commentId },
                 data: { contentStatus: 'SOFT_DELETED' },
@@ -26,12 +26,6 @@ export const adminRouter = createRouter()
             commentId: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id || ctx?.user?.role !== 'ADMIN') {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return []
-            }
-
             return await ctx.prisma.comment.delete({ where: { id: input.commentId } })
         },
     })
@@ -40,12 +34,6 @@ export const adminRouter = createRouter()
             posyId: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id || ctx?.user?.role !== 'ADMIN') {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return []
-            }
-
             return await ctx.prisma.post.update({
                 where: { id: input.posyId },
                 data: { contentStatus: 'SOFT_DELETED' },
@@ -57,12 +45,6 @@ export const adminRouter = createRouter()
             posyId: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            if (!ctx?.user?.id || ctx?.user?.role !== 'ADMIN') {
-                throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-                return []
-            }
-
             return await ctx.prisma.post.delete({ where: { id: input.posyId } })
         },
     })
