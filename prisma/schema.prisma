@@ -3,19 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
-}
-
-model LnAuth {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  k1        String   @unique
-  publicKey String?
-  used      Boolean?
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -29,10 +18,17 @@ model User {
   profileImage             String?
   bio                      String?
   comments                 Comment[]
-  lnAuth                   LnAuth[]
   MentionedUsersOnComments MentionedUsersOnComments[]
   MentionedUsersOnPosts    MentionedUsersOnPosts[]
   posts                    Post[]
+}
+
+model LnAuth {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+  k1        String   @unique
+  pubkey    String?
 }
 
 enum Role {
@@ -136,18 +132,4 @@ model lnurl_migrations {
 model lnurl_migrations_lock {
   index     Int  @id @default(autoincrement())
   is_locked Int?
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model urls {
-  hash          String?   @unique(map: "urls_hash_unique") @db.VarChar(255)
-  initialUses   Int?      @default(1)
-  remainingUses Int?      @default(0)
-  tag           String?   @db.VarChar(255)
-  params        Json?     @db.Json
-  apiKeyId      String?   @db.VarChar(255)
-  createdAt     DateTime? @db.Timestamptz(6)
-  updatedAt     DateTime? @db.Timestamptz(6)
-
-  @@ignore
 }

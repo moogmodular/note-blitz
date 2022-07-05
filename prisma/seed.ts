@@ -96,7 +96,7 @@ async function main() {
                 deltaContent: commentSeed.content.deltaContent,
             },
             title: faker.lorem.sentence(8),
-            authorId: allUsers[getRandomInt(0, allUsers.length - 1)].id,
+            authorId: allUsers[getRandomInt(0, allUsers.length - 1)]!.id,
             // postId: postId,
         }
     }
@@ -110,7 +110,7 @@ async function main() {
                         deltaContent: commentSeed.content.deltaContent,
                     },
                     title: faker.lorem.sentence(8),
-                    authorId: allUsers[getRandomInt(0, allUsers.length - 1)].id,
+                    authorId: allUsers[getRandomInt(0, allUsers.length - 1)]!.id,
                     // postId: post.id,
                 }
             })
