@@ -68,10 +68,7 @@ export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) =>
     <Group position="center" spacing="xl" style={{ minHeight: 100, pointerEvents: 'none' }}>
         <div>
             <Text size="xl" inline>
-                Drag images here or click to select files
-            </Text>
-            <Text size="sm" color="dimmed" inline mt={7}>
-                Attach as many files as you like, each file should not exceed 5mb
+                Drag a file here or click to upload
             </Text>
         </div>
     </Group>
@@ -88,7 +85,7 @@ const NewPost = (props: NewPostProps) => {
         editorHtml: '',
     })
 
-    const mutationCreate = trpc.useMutation(['post:create'])
+    const mutationCreate = trpc.useMutation(['contentItem:create'])
     const utils = trpc.useContext()
 
     const onContentEditorChange = (editorDelta: DeltaStatic, editorHtml: string) => {
@@ -125,12 +122,12 @@ const NewPost = (props: NewPostProps) => {
         })
         setValue('title', '')
         setValue('excerpt', '')
-        void setImage('image as string')
+        void setImage('')
         setContentState({
             editorDelta: {},
             editorHtml: '',
         })
-        await utils.invalidateQueries(['post:getAll'])
+        await utils.invalidateQueries(['contentItem:getOpList'])
     }
 
     return (
