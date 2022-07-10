@@ -1,14 +1,13 @@
 import { useMantineTheme } from '@mantine/core'
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { Button, TextField } from '@mui/material'
 import { signOut } from 'next-auth/react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import AvatarEditor from 'react-avatar-editor'
 import { Controller, useForm } from 'react-hook-form'
 import Resizer from 'react-image-file-resizer'
 import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
-import { dropzoneChildren } from './NewPost'
 
 const EditUserContainer = styled.div`
     display: flex;
@@ -76,6 +75,7 @@ export interface EditUserProps {}
 const EditUser = (props: EditUserProps) => {
     const { handleSubmit, control, setValue } = useForm()
     const theme = useMantineTheme()
+    const editor = useRef(null)
 
     const [image, setImage] = useState('')
 
@@ -91,12 +91,13 @@ const EditUser = (props: EditUserProps) => {
     }, [])
 
     const onSubmit = async (data: { userName?: string; bio?: string }) => {
-        await mutationEditUser.mutateAsync({ userName: data.userName, profileImage: image, bio: data.bio })
+        const base64Image = await resizeFile(image)
+        await mutationEditUser.mutateAsync({ userName: data.userName, profileImage: base64Image, bio: data.bio })
         await utils.invalidateQueries(['user:getMe'])
     }
 
     const resizeFile = (file: any) =>
-        new Promise((resolve) => {
+        new Promise<string>((resolve) => {
             Resizer.imageFileResizer(
                 file,
                 250,
@@ -105,7 +106,7 @@ const EditUser = (props: EditUserProps) => {
                 100,
                 0,
                 (uri) => {
-                    resolve(uri)
+                    resolve(uri as string)
                 },
                 'base64',
             )
@@ -115,10 +116,9 @@ const EditUser = (props: EditUserProps) => {
         void signOut()
     }
 
-    const handleChange = async (data: any) => {
-        const filePath = data[0]
-        const image = await resizeFile(filePath)
-        void setImage(image as string)
+    const handleNewImage = (e: any) => {
+        console.log(e)
+        setImage(e.target.files[0])
     }
 
     return (
@@ -130,19 +130,13 @@ const EditUser = (props: EditUserProps) => {
                     <hr />
                 </>
             ) : null}
-
             <FormContainer onSubmit={handleSubmit(onSubmit)}>
-                {image ? (
-                    <img src={image} alt="post header" width={'250px'} height={'250px'} onClick={() => setImage('')} />
-                ) : (
-                    <Dropzone
-                        onDrop={(files) => handleChange(files)}
-                        onReject={(files) => handleChange(files)}
-                        accept={IMAGE_MIME_TYPE}
-                    >
-                        {(status) => dropzoneChildren(status, theme)}
-                    </Dropzone>
-                )}
+                <div>
+                    <AvatarEditor ref={editor} width={250} height={250} image={image} />
+                    <br />
+                    New File:
+                    <input name="newImage" type="file" onChange={handleNewImage} />
+                </div>
                 <Controller
                     name="userName"
                     control={control}
