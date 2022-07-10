@@ -70,8 +70,7 @@ const NewComment = (props: NewCommentProps) => {
         editorHtml: '',
     })
 
-    const mutationReplyToPost = trpc.useMutation(['comment:replyToPost'])
-    const mutationReplyToComment = trpc.useMutation(['comment:replyToComment'])
+    const mutationReplyToContentItem = trpc.useMutation(['contentItem:replyTo'])
     const utils = trpc.useContext()
 
     const onContentEditorChange = (editorDelta: DeltaStatic, editorHtml: string) => {
@@ -80,19 +79,19 @@ const NewComment = (props: NewCommentProps) => {
 
     const onSubmit = async (data: { title: string; content: string }) => {
         if (state.actionBoxState.actionBoxAction === ActionBoxAction.doReplyToPost) {
-            await mutationReplyToPost.mutateAsync({
+            await mutationReplyToContentItem.mutateAsync({
                 title: data.title,
                 content: { deltaContent: contentState.editorDelta, htmlContent: contentState.editorHtml },
-                postId: props.data!,
+                contentItemId: props.data!,
             })
-            await utils.invalidateQueries(['comment:getForPostById'])
+            await utils.invalidateQueries(['contentItem:getTreeById'])
         } else if (state.actionBoxState.actionBoxAction === ActionBoxAction.doReplyToComment) {
-            await mutationReplyToComment.mutateAsync({
+            await mutationReplyToContentItem.mutateAsync({
                 title: data.title,
                 content: { deltaContent: contentState.editorDelta, htmlContent: contentState.editorHtml },
-                commentId: props.data!,
+                contentItemId: props.data!,
             })
-            await utils.invalidateQueries(['comment:getTreeByCommentId'])
+            await utils.invalidateQueries(['contentItem:getTreeById'])
         }
     }
 

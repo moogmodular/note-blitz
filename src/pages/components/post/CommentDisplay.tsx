@@ -1,8 +1,8 @@
 import { TypographyStylesProvider } from '@mantine/core'
 import { Button } from '@mui/material'
-import { Comment } from '@prisma/client'
+import { ContentItem } from '@prisma/client'
 import { useSession } from 'next-auth/react'
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useRef } from 'react'
 import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
@@ -34,7 +34,7 @@ const CommentFooter = styled.div`
 
 /* eslint-disable-next-line */
 export interface CommentDisplayProps {
-    commentId: string
+    contentItemId: string
     title: string
     depth: number
     content: { htmlContent?: string }
@@ -45,9 +45,9 @@ const CommentDisplay = (props: CommentDisplayProps) => {
     const { state, dispatch } = useContext(UXContext)
     const contentRender = useRef(null)
     const { data: session, status } = useSession()
-    const { data: commentTreeData } = trpc.useQuery(['comment:getTreeByCommentId', { commentId: props.commentId }])
-    const mutationDeleteComment = trpc.useMutation(['admin:deleteCommentById'])
-    const mutationSoftDeleteComment = trpc.useMutation(['admin:softDeleteCommentById'])
+    const { data: commentTreeData } = trpc.useQuery(['contentItem:getTreeById', { contentItemId: props.contentItemId }])
+    const mutationDeleteComment = trpc.useMutation(['admin:deletePostById'])
+    const mutationSoftDeleteComment = trpc.useMutation(['admin:softDeletePostById'])
 
     const handleReplyComment = (data: any) => {
         dispatch({
@@ -59,12 +59,12 @@ const CommentDisplay = (props: CommentDisplayProps) => {
         })
     }
 
-    const handleDeleteComment = (commentId: string) => {
-        mutationDeleteComment.mutate({ commentId: commentId })
+    const handleDeleteComment = (contentItemId: string) => {
+        mutationDeleteComment.mutate({ contentItemId: contentItemId })
     }
 
-    const handleSoftDeleteComment = (commentId: string) => {
-        mutationSoftDeleteComment.mutate({ commentId: commentId })
+    const handleSoftDeleteComment = (contentItemId: string) => {
+        mutationSoftDeleteComment.mutate({ contentItemId: contentItemId })
     }
 
     const createMarkup = (html: any) => ({ __html: html ? html.replace(/\n/g, '').replace(/"/g, '') : null })
@@ -84,17 +84,19 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                         <p>by: {props?.author?.userName}</p>
                         {session?.user?.role === 'ADMIN' ? (
                             <>
-                                <StyledButton onClick={() => handleSoftDeleteComment(props.commentId)}>
+                                <StyledButton onClick={() => handleSoftDeleteComment(props.contentItemId)}>
                                     Soft Delete
                                 </StyledButton>
-                                <StyledButton onClick={() => handleDeleteComment(props.commentId)}>Delete</StyledButton>
+                                <StyledButton onClick={() => handleDeleteComment(props.contentItemId)}>
+                                    Delete
+                                </StyledButton>
                             </>
                         ) : null}
-                        <StyledButton onClick={() => handleReplyComment(props.commentId)}>Reply</StyledButton>
+                        <StyledButton onClick={() => handleReplyComment(props.contentItemId)}>Reply</StyledButton>
                     </CommentFooter>
                     <hr />
                     {commentTreeData?.children
-                        ? commentTreeData.children.map((child: Comment & { author: Record<string, any> }) => {
+                        ? commentTreeData.children.map((child: ContentItem & { author: Record<string, any> }) => {
                               const content = child.content as { htmlContent: string }
                               return (
                                   <CommentDisplay
@@ -102,7 +104,7 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                                       depth={props.depth + 1}
                                       author={child.author}
                                       content={content}
-                                      commentId={child.id}
+                                      contentItemId={child.id}
                                       title={child.title}
                                   />
                               )

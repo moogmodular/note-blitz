@@ -18,7 +18,7 @@ export interface PreviewProps {
     content: string
     title: string
     excerpt: string
-    commentAmount: number
+    replyCount: number
     headerImage: string
     author: string
     tags: { tag: string; tagId: string }[]
@@ -26,7 +26,7 @@ export interface PreviewProps {
 
 /* eslint-disable-next-line */
 export interface PostViewProps {
-    postId: string
+    contentItemId: string
     postPreview: PreviewProps
 }
 
@@ -49,19 +49,19 @@ const PostView = (props: PostViewProps) => {
         setExpanded(false)
     }
 
-    const handleDeletePost = (postId: string) => {
-        mutationDeletePost.mutate({ posyId: postId })
+    const handleDeletePost = (contentItemId: string) => {
+        mutationDeletePost.mutate({ contentItemId: contentItemId })
     }
 
-    const handleSoftDeletePost = (postId: string) => {
-        mutationSoftDeletePost.mutate({ posyId: postId })
+    const handleSoftDeletePost = (contentItemId: string) => {
+        mutationSoftDeletePost.mutate({ contentItemId: contentItemId })
     }
 
     return (
         <PostViewContainer ref={parent}>
             {expanded ? (
                 <FullPost
-                    postId={props.postId}
+                    contentItemId={props.contentItemId}
                     handleClose={handleClose}
                     handleDeletePost={handleDeletePost}
                     handleSoftDeletePost={handleSoftDeletePost}

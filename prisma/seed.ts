@@ -3,8 +3,8 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 import { slugify } from '../src/utils/string.service'
 import { commentSeed } from './seed/comment.seed'
+import { contentItemSeed } from './seed/contentItemSeed'
 import { imageMock } from './seed/image.seed'
-import { postSeed } from './seed/post.seed'
 import { tagsMock } from './seed/tag.seed'
 import { usersMock } from './seed/user.seed'
 
@@ -23,12 +23,9 @@ async function main() {
     console.log(`start seeding ..., deleting all data`)
 
     await Promise.all([
-        await prisma.tagsOnPosts.deleteMany(),
-        await prisma.tagsOnComments.deleteMany(),
-        await prisma.mentionedUsersOnComments.deleteMany(),
-        await prisma.mentionedUsersOnPosts.deleteMany(),
-        await prisma.comment.deleteMany(),
-        await prisma.post.deleteMany(),
+        await prisma.tagsOnContentItems.deleteMany(),
+        await prisma.mentionedUsersOnContentItems.deleteMany(),
+        await prisma.contentItem.deleteMany(),
         await prisma.user.deleteMany(),
         await prisma.tag.deleteMany(),
         await prisma.lnAuth.deleteMany(),
@@ -44,36 +41,36 @@ async function main() {
 
     await Promise.all(
         usersMock.map(async (user) => {
-            const posts = [...Array(getRandomInt(1, 6))].map((value, index) => {
+            const contentItems = [...Array(getRandomInt(1, 6))].map((value, index) => {
                 const title = faker.lorem.sentence(10)
                 return {
                     headerImage: imageMock,
                     slug: slugify(title),
                     content: {
-                        htmlContent: postSeed.content.htmlContent,
-                        deltaContent: postSeed.content.deltaContent,
+                        htmlContent: contentItemSeed.content.htmlContent,
+                        deltaContent: contentItemSeed.content.deltaContent,
                     },
-                    excerpt: postSeed.excerpt,
+                    excerpt: contentItemSeed.excerpt,
                     contentStatus: 'PUBLISHED',
                     title: title,
-                } as Prisma.PostCreateManyAuthorInput
+                } as Prisma.ContentItemCreateManyAuthorInput
             })
 
-            await prisma.user.create({ data: { ...user, posts: { createMany: { data: posts } } } })
+            await prisma.user.create({ data: { ...user, contentItems: { createMany: { data: contentItems } } } })
         }),
     )
 
-    const allPosts = await prisma.post.findMany({})
+    const allContentItems = await prisma.contentItem.findMany({})
 
     await Promise.all(
-        allPosts.map(async (post) => {
+        allContentItems.map(async (contentItem) => {
             const allTags = await prisma.tag.findMany({})
             const tagCandidates = getRandomElements(allTags)
 
             await Promise.all(
                 tagCandidates.map(async (tagCandidate) => {
-                    await prisma.post.update({
-                        where: { id: post.id },
+                    await prisma.contentItem.update({
+                        where: { id: contentItem.id },
                         data: {
                             tags: {
                                 create: {
@@ -89,7 +86,7 @@ async function main() {
 
     const allUsers = await prisma.user.findMany({})
 
-    const doComment = (postId: string) => {
+    const doContentItemChild = (contentItemId: string) => {
         return {
             content: {
                 htmlContent: commentSeed.content.htmlContent,
@@ -97,58 +94,39 @@ async function main() {
             },
             title: faker.lorem.sentence(8),
             authorId: allUsers[getRandomInt(0, allUsers.length - 1)]!.id,
-            // postId: postId,
+            // contentItemId: contentItemId,
         }
     }
 
     await Promise.all(
-        allPosts.map(async (post) => {
-            const comments = [...Array(getRandomInt(1, 6))].map((value, index) => {
+        allContentItems.map(async (contentItem) => {
+            const contentItemChildren = [...Array(getRandomInt(1, 6))].map((value, index) => {
                 return {
+                    contentItemSourceId: contentItem.id,
                     content: {
                         htmlContent: commentSeed.content.htmlContent,
                         deltaContent: commentSeed.content.deltaContent,
                     },
                     title: faker.lorem.sentence(8),
                     authorId: allUsers[getRandomInt(0, allUsers.length - 1)]!.id,
-                    // postId: post.id,
+                    // contentItemId: post.id,
                 }
             })
 
-            const postRes = await prisma.post.update({
-                where: { id: post.id },
+            const postRes = await prisma.contentItem.update({
+                where: { id: contentItem.id },
                 data: {
-                    comments: {
+                    children: {
                         createMany: {
-                            data: comments,
+                            data: contentItemChildren,
                         },
                     },
                 },
                 include: {
-                    comments: true,
+                    children: true,
                     tags: true,
                 },
             })
-
-            const allComments = await prisma.comment.findMany()
-
-            // await Promise.all(
-            //     allComments.map(async (comm) => {
-            //         await prisma.comment.update({
-            //             where: { id: comm.id },
-            //             data: {
-            //                 children: {
-            //                     createMany: {
-            //                         data: [
-            //                             { ...doComment(), postId: post.id },
-            //                             { ...doComment(), postId: post.id },
-            //                         ],
-            //                     },
-            //                 },
-            //             },
-            //         })
-            //     }),
-            // )
         }),
     )
 

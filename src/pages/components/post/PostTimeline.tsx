@@ -20,33 +20,39 @@ const PostPreviewContainer = styled.div`
 `
 
 export const TimelineByUser = ({ user }: { user: string }) => {
-    const { data: postData } = trpc.useQuery(['post:getPostsByUser', { userName: user }])
+    const { data: postData } = trpc.useQuery(['contentItem:getByUser', { userName: user }])
     return (
         <>
             {postData
-                ? postData.map((post: PreviewProps) => <PostView key={post.id} postId={post.id} postPreview={post} />)
+                ? postData.map((post: PreviewProps) => (
+                      <PostView key={post.id} contentItemId={post.id} postPreview={post} />
+                  ))
                 : null}
         </>
     )
 }
 
 export const TimelineByTag = ({ tag }: { tag: string }) => {
-    const { data: postData } = trpc.useQuery(['post:getPostsByTag', { tag: tag }])
+    const { data: postData } = trpc.useQuery(['contentItem:getByTag', { tag: tag }])
     return (
         <>
             {postData
-                ? postData.map((post: PreviewProps) => <PostView key={post.id} postId={post.id} postPreview={post} />)
+                ? postData.map((post: PreviewProps) => (
+                      <PostView key={post.id} contentItemId={post.id} postPreview={post} />
+                  ))
                 : null}
         </>
     )
 }
 
 export const TimelineByAll = () => {
-    const { data: postData } = trpc.useQuery(['post:getAll'])
+    const { data: postData } = trpc.useQuery(['contentItem:getOpList'])
     return (
         <>
             {postData
-                ? postData.map((post: PreviewProps) => <PostView key={post.id} postId={post.id} postPreview={post} />)
+                ? postData.map((post: PreviewProps) => (
+                      <PostView key={post.id} contentItemId={post.id} postPreview={post} />
+                  ))
                 : null}
         </>
     )

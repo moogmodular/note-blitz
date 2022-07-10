@@ -31,7 +31,7 @@ const UserList = (props: UserListProps) => {
                       return (
                           <UserPreviewLine key={user.id}>
                               <TagDisplayPill tagValue={user.userName} tagType={'@'} />
-                              <b>{user.posts} Posts</b>
+                              <b>{user.contentItems} Posts</b>
                               <p>{format(new Date(user.createdAt), 'dd.MM.yyyy')}</p>
                               <PublicKeyDisplayPill publicKey={user.publicKey} />
                           </UserPreviewLine>

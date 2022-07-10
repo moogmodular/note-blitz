@@ -26,16 +26,16 @@ export interface IsolatedPostProps {
 
 const IsolatedPost = (props: IsolatedPostProps) => {
     const router = useRouter()
-    const { data: postData } = trpc.useQuery(['post:getPostBySlug', { slug: props.slug }])
+    const { data: postData } = trpc.useQuery(['contentItem:getBySlug', { slug: props.slug }])
     const mutationDeletePost = trpc.useMutation(['admin:deletePostById'])
     const mutationSoftDeletePost = trpc.useMutation(['admin:softDeletePostById'])
 
-    const handleDeletePost = (postId: string) => {
-        mutationDeletePost.mutate({ posyId: postId })
+    const handleDeletePost = (contentItemId: string) => {
+        mutationDeletePost.mutate({ contentItemId: contentItemId })
     }
 
-    const handleSoftDeletePost = (postId: string) => {
-        mutationSoftDeletePost.mutate({ posyId: postId })
+    const handleSoftDeletePost = (contentItemId: string) => {
+        mutationSoftDeletePost.mutate({ contentItemId: contentItemId })
     }
 
     const handleClose = async () => {
@@ -46,7 +46,7 @@ const IsolatedPost = (props: IsolatedPostProps) => {
         <IsolatedPostPropsContainer>
             {postData ? (
                 <FullPost
-                    postId={postData?.id!}
+                    contentItemId={postData?.id!}
                     handleClose={handleClose}
                     handleDeletePost={handleDeletePost}
                     handleSoftDeletePost={handleSoftDeletePost}

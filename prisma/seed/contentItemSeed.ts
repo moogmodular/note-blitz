@@ -1,6 +1,4 @@
-import { Prisma } from '@prisma/client'
-
-export const postSeed = {
+export const contentItemSeed = {
     excerpt:
         'Let’s talk for a moment about how we talk about our teams. This might not seem like something that needs a whole article dedicated to it, but it’s actually quite crucial. The way that we refer to our teams sends signals: to stakeholders, to your peers, to the team itself, and even to ourselves. In addressing how we speak about our teams, we’ll also talk about accountability.',
     content: {

@@ -8,19 +8,39 @@ datasource db {
 }
 
 model User {
-  id                       String                     @id @default(uuid())
-  role                     Role                       @default(USER)
-  createdAt                DateTime                   @default(now())
-  updatedAt                DateTime                   @updatedAt
-  lastLogin                DateTime?
-  publicKey                String                     @unique
-  userName                 String                     @unique
-  profileImage             String?
-  bio                      String?
-  comments                 Comment[]
-  MentionedUsersOnComments MentionedUsersOnComments[]
-  MentionedUsersOnPosts    MentionedUsersOnPosts[]
-  posts                    Post[]
+  id                           String                         @id @default(uuid())
+  role                         Role                           @default(USER)
+  createdAt                    DateTime                       @default(now())
+  updatedAt                    DateTime                       @updatedAt
+  lastLogin                    DateTime?
+  publicKey                    String                         @unique
+  userName                     String                         @unique
+  profileImage                 String?
+  bio                          String?
+  mentionedUsersOnContentItems MentionedUsersOnContentItems[]
+  contentItems                 ContentItem[]
+  transactionRecieved          Transaction[]                  @relation("recipient")
+  transactionSent              Transaction[]                  @relation("sender")
+}
+
+model Transaction {
+  id            String            @id @default(uuid())
+  createdAt     DateTime          @default(now())
+  type          TransactionReason @default(PAYMENT_IN)
+  amount        Int
+  fromUserId    String?
+  fromUser      User?             @relation("recipient", fields: [fromUserId], references: [id])
+  toUserId      String?
+  toUser        User?             @relation("sender", fields: [toUserId], references: [id])
+  contentItem   ContentItem?      @relation(fields: [contentItemId], references: [id])
+  contentItemId String?
+}
+
+enum TransactionReason {
+  PAYMENT_OUT
+  PAYMENT_IN
+  TIP_CONTENT_ITEM
+  UNLOCK_POST_COMMENT
 }
 
 model LnAuth {
@@ -37,39 +57,27 @@ enum Role {
   ADMIN
 }
 
-model Post {
-  id             String                  @id @default(uuid())
-  contentStatus  ContentStatus           @default(PUBLISHED)
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @updatedAt
-  content        Json
-  title          String
-  slug           String                  @unique
-  excerpt        String
-  authorId       String
-  headerImage    String
-  author         User                    @relation(fields: [authorId], references: [id])
-  comments       Comment[]
-  mentionedUsers MentionedUsersOnPosts[]
-  tags           TagsOnPosts[]
-}
-
-model Comment {
-  id             String                     @id @default(uuid())
-  contentStatus  ContentStatus              @default(PUBLISHED)
-  createdAt      DateTime                   @default(now())
-  updatedAt      DateTime                   @updatedAt
-  content        Json
-  title          String
-  postId         String
-  parentId       String?
-  authorId       String?
-  author         User?                      @relation(fields: [authorId], references: [id])
-  parent         Comment?                   @relation("ParentCommentToChildren", fields: [parentId], references: [id])
-  post           Post                       @relation(fields: [postId], references: [id], onDelete: Cascade)
-  children       Comment[]                  @relation("ParentCommentToChildren")
-  mentionedUsers MentionedUsersOnComments[]
-  tags           TagsOnComments[]
+model ContentItem {
+  id                        String                         @id @default(uuid())
+  contentItemSourceId       String?
+  contentItemSource         ContentItem?                   @relation("ContentItemSource", fields: [contentItemSourceId], references: [id])
+  contentItemSourceChildren ContentItem[]                  @relation("ContentItemSource")
+  contentStatus             ContentStatus                  @default(PUBLISHED)
+  createdAt                 DateTime                       @default(now())
+  updatedAt                 DateTime                       @updatedAt
+  content                   Json
+  title                     String
+  slug                      String?                        @unique
+  excerpt                   String?
+  authorId                  String
+  headerImage               String?
+  author                    User                           @relation(fields: [authorId], references: [id])
+  relatedTransactions       Transaction[]
+  mentionedUsers            MentionedUsersOnContentItems[]
+  tags                      TagsOnContentItems[]
+  parentId                  String?
+  parent                    ContentItem?                   @relation("ContentItemRelation", fields: [parentId], references: [id])
+  children                  ContentItem[]                  @relation("ContentItemRelation")
 }
 
 enum ContentStatus {
@@ -78,48 +86,30 @@ enum ContentStatus {
 }
 
 model Tag {
-  id             String           @id @default(uuid())
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  name           String           @unique
-  TagsOnComments TagsOnComments[]
-  posts          TagsOnPosts[]
+  id           String               @id @default(uuid())
+  privileged   Boolean              @default(false)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  name         String               @unique
+  contentItems TagsOnContentItems[]
 }
 
-model MentionedUsersOnComments {
-  commentId String
-  userId    String
-  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model MentionedUsersOnContentItems {
+  contentItemId String
+  userId        String
+  contentItem   ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([commentId, userId])
+  @@id([contentItemId, userId])
 }
 
-model TagsOnComments {
-  commentId String
-  tagId     String
-  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+model TagsOnContentItems {
+  contentItemId String
+  tagId         String
+  contentItem   ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
-  @@id([commentId, tagId])
-}
-
-model MentionedUsersOnPosts {
-  postId String
-  userId String
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([postId, userId])
-}
-
-model TagsOnPosts {
-  postId String
-  tagId  String
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([postId, tagId])
+  @@id([contentItemId, tagId])
 }
 
 model lnurl_migrations {

@@ -10,41 +10,22 @@ export const adminRouter = createRouter()
         }
         return next()
     })
-    .mutation('softDeleteCommentById', {
-        input: z.object({
-            commentId: z.string(),
-        }),
-        resolve: async ({ input, ctx }) => {
-            return await ctx.prisma.comment.update({
-                where: { id: input.commentId },
-                data: { contentStatus: 'SOFT_DELETED' },
-            })
-        },
-    })
-    .mutation('deleteCommentById', {
-        input: z.object({
-            commentId: z.string(),
-        }),
-        resolve: async ({ input, ctx }) => {
-            return await ctx.prisma.comment.delete({ where: { id: input.commentId } })
-        },
-    })
     .mutation('softDeletePostById', {
         input: z.object({
-            posyId: z.string(),
+            contentItemId: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            return await ctx.prisma.post.update({
-                where: { id: input.posyId },
+            return await ctx.prisma.contentItem.update({
+                where: { id: input.contentItemId },
                 data: { contentStatus: 'SOFT_DELETED' },
             })
         },
     })
     .mutation('deletePostById', {
         input: z.object({
-            posyId: z.string(),
+            contentItemId: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            return await ctx.prisma.post.delete({ where: { id: input.posyId } })
+            return await ctx.prisma.contentItem.delete({ where: { id: input.contentItemId } })
         },
     })

@@ -1,6 +1,8 @@
 import autoAnimate from '@formkit/auto-animate'
 import { TypographyStylesProvider } from '@mantine/core'
 import { Button } from '@mui/material'
+import { ContentItem } from '@prisma/client'
+import { Flash } from '@styled-icons/entypo/Flash'
 import { Outbound } from '@styled-icons/material-outlined/Outbound'
 import { format } from 'date-fns'
 import parse, { DOMNode, HTMLReactParserOptions } from 'html-react-parser'
@@ -84,6 +86,12 @@ const HeaderTitleContainer = styled.div`
     align-items: baseline;
 `
 
+export const SmallFlash = styled(Flash)`
+    width: 15px;
+    height: 15px;
+    color: chartreuse;
+`
+
 export const SmallOutbound = styled(Outbound)`
     width: 25px;
     height: 25px;
@@ -97,7 +105,7 @@ const ButtonOutContainer = styled.div`
 
 /* eslint-disable-next-line */
 export interface FullPostProps {
-    postId: string
+    contentItemId: string
     handleClose: () => void
     handleDeletePost: (id: string) => void
     handleSoftDeletePost: (id: string) => void
@@ -113,8 +121,8 @@ const FullPost = (props: FullPostProps) => {
         parent.current && autoAnimate(parent.current)
     }, [parent])
 
-    const { data: postData } = trpc.useQuery(['post:getPostById', { postId: props.postId }])
-    const { data: commentData } = trpc.useQuery(['comment:getForPostById', { postId: props.postId }])
+    const { data: postData } = trpc.useQuery(['contentItem:getById', { contentItemId: props.contentItemId }])
+    const { data: commentData } = trpc.useQuery(['contentItem:getTreeById', { contentItemId: props.contentItemId }])
 
     const handleEditPost = (data: any) => {
         dispatch({
@@ -131,6 +139,16 @@ const FullPost = (props: FullPostProps) => {
             type: UXActionTypes.SetActionBox,
             payload: {
                 actionBoxAction: ActionBoxAction.doReplyToPost,
+                actionBoxData: data,
+            },
+        })
+    }
+
+    const handleTip = (data: any) => {
+        dispatch({
+            type: UXActionTypes.SetActionBox,
+            payload: {
+                actionBoxAction: ActionBoxAction.tipArticle,
                 actionBoxData: data,
             },
         })
@@ -171,10 +189,14 @@ const FullPost = (props: FullPostProps) => {
                                     <ButtonOutContainer>
                                         {session && session.user.role === 'ADMIN' ? (
                                             <>
-                                                <StyledButton onClick={() => props.handleSoftDeletePost(props.postId)}>
+                                                <StyledButton
+                                                    onClick={() => props.handleSoftDeletePost(props.contentItemId)}
+                                                >
                                                     SDelete
                                                 </StyledButton>
-                                                <StyledButton onClick={() => props.handleDeletePost(props.postId)}>
+                                                <StyledButton
+                                                    onClick={() => props.handleDeletePost(props.contentItemId)}
+                                                >
                                                     Delete
                                                 </StyledButton>
                                             </>
@@ -217,6 +239,10 @@ const FullPost = (props: FullPostProps) => {
                                 {session?.user.userName === postData?.author?.userName ? (
                                     <StyledButton onClick={() => handleEditPost(postData.id)}>Edit</StyledButton>
                                 ) : null}
+                                earned: {postData.earned}
+                                <StyledButton onClick={() => handleTip(postData.id)}>
+                                    <SmallFlash /> Tip
+                                </StyledButton>
                                 <StyledButton onClick={() => handleReplyPost(postData.id)}>Reply</StyledButton>
                             </ButtonRow>
                         </PostingFooter>
@@ -224,7 +250,7 @@ const FullPost = (props: FullPostProps) => {
                         <hr />
                         <div ref={parent}>
                             {commentData &&
-                                commentData.map((comment) => {
+                                commentData.children.map((comment: ContentItem & { author: Record<string, any> }) => {
                                     const author = comment.author as { userName?: string | undefined }
                                     const content = comment.content as { htmlContent?: string | undefined }
                                     return (
@@ -233,7 +259,7 @@ const FullPost = (props: FullPostProps) => {
                                             depth={0}
                                             author={author}
                                             content={content}
-                                            commentId={comment.id}
+                                            contentItemId={comment.id}
                                             title={comment.title}
                                         />
                                     )
