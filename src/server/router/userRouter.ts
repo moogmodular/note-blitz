@@ -15,12 +15,35 @@ export const userRouter = createRouter()
             })
         },
     })
+    .query('publicInfoByName', {
+        input: z.object({
+            name: z.string(),
+        }),
+        resolve: async ({ ctx, input }) => {
+            return await ctx.prisma.user
+                .findUnique({
+                    where: { userName: input.name },
+                    include: {
+                        contentItems: true,
+                        transactionRecieved: true,
+                        transactionSent: true,
+                    },
+                })
+                .then((user) => {
+                    return {
+                        ...user,
+                        totalContributions: user!.contentItems.length,
+                        totalEarned: user!.transactionRecieved.reduce((acc, cur) => acc + cur.amount, 0),
+                    }
+                })
+        },
+    })
     .query('getAll', {
         resolve: async ({ ctx }) => {
             const users = await ctx.prisma.user.findMany({
                 take: 5,
-                include: { posts: true },
-                orderBy: { posts: { _count: 'desc' } },
+                include: { contentItems: true },
+                orderBy: { contentItems: { _count: 'desc' } },
             })
             return users.map((user) => {
                 return {
@@ -28,7 +51,7 @@ export const userRouter = createRouter()
                     createdAt: user.createdAt,
                     id: user.id,
                     userName: user.userName,
-                    posts: user.posts.length,
+                    contentItems: user.contentItems.length,
                 }
             })
         },

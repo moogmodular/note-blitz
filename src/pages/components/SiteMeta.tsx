@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
+import SiteMetaContext from './SiteMetaContext'
 import TaxonomyList from './TaxonomyList'
 import UserList from './UserList'
 
@@ -66,19 +67,19 @@ const SiteMeta = (props: SiteMetaProps) => {
         <SiteMetaPropsContainer>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="site meta tabs">
-                    <Tab label="User list" {...a11yProps(0)} />
+                    <Tab label="Context" {...a11yProps(0)} />
                     <Tab label="Taxonomy" {...a11yProps(1)} />
-                    <Tab label="Context" {...a11yProps(2)} />
+                    <Tab label="User list" {...a11yProps(2)} />
                 </Tabs>
             </Box>
-            <TabPanel value={value} index={0}>
+            <TabPanel value={value} index={2}>
                 <UserList />
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <TaxonomyList />
             </TabPanel>
-            <TabPanel value={value} index={2}>
-                Item Three
+            <TabPanel value={value} index={0}>
+                <SiteMetaContext />
             </TabPanel>
         </SiteMetaPropsContainer>
     )
