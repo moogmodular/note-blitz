@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 
-export const tagsMock: Prisma.TagCreateManyInput[] = [
+export const tagsMock = [
     {
         name: 'ln-webdev',
     },
@@ -18,5 +18,9 @@ export const tagsMock: Prisma.TagCreateManyInput[] = [
     },
     {
         name: 'finance',
+    },
+    {
+        name: 'nbsite',
+        privileged: true,
     },
 ]

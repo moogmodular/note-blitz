@@ -1,3 +1,4 @@
+import { useSession } from 'next-auth/react'
 import { Delta, DeltaStatic, Sources } from 'quill'
 import React, { useMemo, useState } from 'react'
 import { UnprivilegedEditor } from 'react-quill'
@@ -18,6 +19,7 @@ export interface ContentEditorProps {
 const ContentEditor = (props: ContentEditorProps) => {
     const { client } = trpc.useContext()
     const [value, onChange] = useState<string>('')
+    const { data: session } = useSession()
 
     const mentions = useMemo(
         () => ({
@@ -42,9 +44,11 @@ const ContentEditor = (props: ContentEditorProps) => {
                                   }
                               })
 
-                              tagList[0] = {
-                                  id: -1,
-                                  value: searchTerm,
+                              if (!searchTerm.includes('nb') && session?.user.role !== 'ADMIN') {
+                                  tagList[0] = {
+                                      id: -1,
+                                      value: searchTerm,
+                                  }
                               }
 
                               return tagList

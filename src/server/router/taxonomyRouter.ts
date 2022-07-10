@@ -7,14 +7,14 @@ export const taxonomyRouter = createRouter()
         resolve: async ({ ctx }) => {
             const tags = await ctx.prisma.tag.findMany({
                 take: 5,
-                include: { posts: true },
-                orderBy: { posts: { _count: 'desc' } },
+                include: { contentItems: true },
+                orderBy: { contentItems: { _count: 'desc' } },
             })
             return tags.map((tag) => {
                 return {
                     tagName: tag.name,
                     tagId: tag.id,
-                    postCount: tag.posts.length,
+                    postCount: tag.contentItems.length,
                 }
             })
         },
@@ -24,15 +24,24 @@ export const taxonomyRouter = createRouter()
             name: z.string(),
         }),
         resolve: async ({ ctx, input }) => {
-            const tags = await ctx.prisma.tag.findMany({
-                take: 5,
-                where: { name: { contains: input.name, mode: 'insensitive' } },
-            })
+            const tags = await ctx.prisma.tag
+                .findMany({
+                    take: 5,
+                    where: { name: { contains: input.name, mode: 'insensitive' } },
+                })
+                .then((tags) => tags.filter((tag) => !tag.name.toLowerCase().includes('nb')))
             return tags.map((tag) => {
                 return {
                     tagName: tag.name,
                     tagId: tag.id,
                 }
+            })
+        },
+    })
+    .query('getPrivileged', {
+        resolve: async ({ ctx, input }) => {
+            return await ctx.prisma.tag.findMany({
+                where: { privileged: true },
             })
         },
     })
