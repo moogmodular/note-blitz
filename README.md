@@ -1,3 +1,5 @@
-# Create T3 App
+# Start the app
 
-This is an app bootstrapped according to the [init.tips](https://init.tips) stack, also known as the T3-Stack.
+Start app with your local ip address
+
+`yarn dev -H 192.168.0.199 `
