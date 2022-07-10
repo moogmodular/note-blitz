@@ -144,15 +144,15 @@ const FullPost = (props: FullPostProps) => {
         })
     }
 
-    const handleTip = (data: any) => {
-        dispatch({
-            type: UXActionTypes.SetActionBox,
-            payload: {
-                actionBoxAction: ActionBoxAction.tipArticle,
-                actionBoxData: data,
-            },
-        })
-    }
+    // const handleTip = (data: any) => {
+    //     dispatch({
+    //         type: UXActionTypes.SetActionBox,
+    //         payload: {
+    //             actionBoxAction: ActionBoxAction.tipArticle,
+    //             actionBoxData: data,
+    //         },
+    //     })
+    // }
 
     const parser = (input: string) => {
         const options: HTMLReactParserOptions = {
@@ -240,9 +240,9 @@ const FullPost = (props: FullPostProps) => {
                                     <StyledButton onClick={() => handleEditPost(postData.id)}>Edit</StyledButton>
                                 ) : null}
                                 earned: {postData.earned}
-                                <StyledButton onClick={() => handleTip(postData.id)}>
-                                    <SmallFlash /> Tip
-                                </StyledButton>
+                                {/*<StyledButton onClick={() => handleTip(postData.id)}>*/}
+                                {/*    <SmallFlash /> Tip*/}
+                                {/*</StyledButton>*/}
                                 <StyledButton onClick={() => handleReplyPost(postData.id)}>Reply</StyledButton>
                             </ButtonRow>
                         </PostingFooter>
