@@ -1,3 +1,4 @@
+import { Divider } from '@mui/material'
 import { format } from 'date-fns'
 import React from 'react'
 import styled from 'styled-components'
@@ -43,8 +44,9 @@ export interface PostPreviewProps {
     headerImage: string
     title: string
     excerpt: string
-    commentAmount: number
+    replyCount: number
     author: string
+    earned?: string
     tags: { tag: string; tagId: string }[]
     handleExpand: () => void
 }
@@ -82,8 +84,12 @@ const PostPreview = (props: PostPreviewProps) => {
                             <b>
                                 by: <TagDisplayPill tagValue={props.author} tagType={'@'} />
                             </b>
+                            <Divider light orientation={'vertical'} />
                             <b>created: {format(props.createdAt ?? new Date(), 'dd.MM.yyyy')}</b>
-                            <b>{props.commentAmount} comments</b>
+                            <Divider light orientation={'vertical'} />
+                            <b>{props.earned} sats earned</b>
+                            <Divider light orientation={'vertical'} />
+                            <b>{props.replyCount} comments</b>
                         </div>
                     </PostingFooterLeft>
                 </PostingFooter>
