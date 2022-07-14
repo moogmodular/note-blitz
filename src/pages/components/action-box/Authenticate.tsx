@@ -1,12 +1,12 @@
 import autoAnimate from '@formkit/auto-animate'
-import {Accordion, AccordionDetails, AccordionSummary} from '@mui/material'
-import {ExpandMore} from '@styled-icons/material-rounded/ExpandMore'
-import {signIn, useSession} from 'next-auth/react'
-import {QRCodeSVG} from 'qrcode.react'
-import React, {useEffect, useRef, useState} from 'react'
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import { ExpandMore } from '@styled-icons/material-rounded/ExpandMore'
+import { signIn, useSession } from 'next-auth/react'
+import { QRCodeSVG } from 'qrcode.react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import {trpc} from '../../../utils/trpc'
+import { trpc } from '../../../utils/trpc'
 import WalletList from '../common/WalletList'
 
 const AuthenticateContainer = styled.div`

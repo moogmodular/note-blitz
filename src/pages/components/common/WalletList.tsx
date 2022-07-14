@@ -25,20 +25,23 @@ export interface Wallet {
 
 /* eslint-disable-next-line */
 export interface WalletListProps {
-    walletList: Wallet[]
+    // TODO: fix this
+    walletList: any[]
 }
 
 const WalletList = (props: WalletListProps) => {
     return (
         <WalletListContainer>
-            {props.walletList.map((wlt) => {
-                return (
-                    <WalletListColumn key={wlt.id} target="_blank" href={wlt.url}>
-                        <img src={wlt.icon} alt={wlt.displayName} width={'50px'} height={'50px'} />
-                        <p>{wlt.displayName}</p>
-                    </WalletListColumn>
-                )
-            })}
+            {props.walletList
+                ? props.walletList.map((wlt) => {
+                      return (
+                          <WalletListColumn key={wlt.id} target="_blank" href={wlt.url}>
+                              <img src={wlt.icon} alt={wlt.displayName} width={'50px'} height={'50px'} />
+                              <p>{wlt.displayName}</p>
+                          </WalletListColumn>
+                      )
+                  })
+                : null}
         </WalletListContainer>
     )
 }

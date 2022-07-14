@@ -86,7 +86,12 @@ const Header = (props: HeaderProps) => {
     const { data: meUserData, remove } = trpc.useQuery(['user:getMe'], {
         onSuccess: (data) => {
             if (data?.userName) {
-                setFullUser({ ...data, profileImage: data.profileImage ?? '' })
+                setFullUser({
+                    ...data,
+                    publicKey: data.publicKey ?? '',
+                    userName: data.userName ?? '',
+                    profileImage: data.profileImage ?? '',
+                })
             } else {
                 void signOut()
             }

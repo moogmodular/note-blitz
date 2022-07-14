@@ -1,9 +1,9 @@
-import { format } from 'date-fns'
-import { useRouter } from 'next/router'
+import {format} from 'date-fns'
+import {useRouter} from 'next/router'
 import React from 'react'
 import styled from 'styled-components'
 
-import { trpc } from '../../utils/trpc'
+import {trpc} from '../../utils/trpc'
 
 const MetaLine = styled.div`
     display: flex;
