@@ -81,13 +81,18 @@ const Header = (props: HeaderProps) => {
 
     const { data: session } = useSession()
 
-    const { data: meUserData } = trpc.useQuery(['user:getMe'], {
+    const { data: dataBalance, error } = trpc.useQuery(['lightning:getNodeBalance'])
+
+    const { data: meUserData, remove } = trpc.useQuery(['user:getMe'], {
         onSuccess: (data) => {
             if (data?.userName) {
                 setFullUser({ ...data, profileImage: data.profileImage ?? '' })
             } else {
                 void signOut()
             }
+        },
+        onError: (err) => {
+            console.log(err)
         },
     })
 
@@ -140,6 +145,8 @@ const Header = (props: HeaderProps) => {
         <HeaderContainer>
             <LogoContainer>
                 <Image onClick={handleLogoCLick} src="/logo.svg" alt="note blitz logo" width={'60px'} height={'60px'} />
+                {error ? error.message : null}
+                {dataBalance ? dataBalance : null}
                 <UserContainer onClick={handleUserCLick}>
                     {fullUser ? (
                         <>
