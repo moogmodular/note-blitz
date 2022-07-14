@@ -25,7 +25,7 @@ export const userRouter = createRouter()
                     where: { userName: input.name },
                     include: {
                         contentItems: true,
-                        transactionRecieved: true,
+                        transactionReceived: true,
                         transactionSent: true,
                     },
                 })
@@ -33,7 +33,7 @@ export const userRouter = createRouter()
                     return {
                         ...user,
                         totalContributions: user!.contentItems.length,
-                        totalEarned: user!.transactionRecieved.reduce((acc, cur) => acc + cur.amount, 0),
+                        totalEarned: user!.transactionReceived.reduce((acc, cur) => acc + cur.amount, 0),
                     }
                 })
         },
@@ -67,12 +67,6 @@ export const userRouter = createRouter()
                 },
             }),
     })
-    .middleware(async ({ ctx, next }) => {
-        if (!ctx?.user) {
-            throw new TRPCError({ code: 'UNAUTHORIZED' })
-        }
-        return next()
-    })
     .mutation('edit', {
         input: z.object({
             userName: z.string().optional(),
@@ -80,6 +74,9 @@ export const userRouter = createRouter()
             bio: z.string().optional(),
         }),
         resolve: async ({ ctx, input }) => {
+            if (!ctx?.user) {
+                throw new TRPCError({ code: 'UNAUTHORIZED' })
+            }
             return await ctx.prisma.user.update({
                 where: { id: ctx?.user?.id },
                 data: { ...input },
@@ -88,6 +85,21 @@ export const userRouter = createRouter()
     })
     .query('getMe', {
         resolve: async ({ ctx }) => {
-            return await ctx.prisma.user.findUnique({ where: { id: ctx?.user?.id } })
+            return await ctx.prisma.user
+                .findUnique({
+                    where: { id: ctx?.user?.id },
+                    include: { contentItems: true, transactionReceived: true, mentionedUsersOnContentItems: true },
+                })
+                .then((user) => {
+                    return {
+                        ...user,
+                        totalContributions: user!.contentItems.length,
+                        totalEarned: user!.transactionReceived.reduce((acc, cur) => acc + cur.amount, 0),
+                        totalMentioned: user!.mentionedUsersOnContentItems.length,
+                    }
+                })
+                .catch((e) => {
+                    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'auth failed' })
+                })
         },
     })
