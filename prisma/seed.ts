@@ -7,6 +7,7 @@ import { contentItemSeed } from './seed/contentItemSeed'
 import { imageMock } from './seed/image.seed'
 import { tagsMock } from './seed/tag.seed'
 import { usersMock } from './seed/user.seed'
+import { walletSeed } from './seed/wallet.seed'
 
 const prisma = new PrismaClient()
 
@@ -36,6 +37,12 @@ async function main() {
     await Promise.all(
         tagsMock.map(async (tag) => {
             await prisma.tag.create({ data: tag })
+        }),
+    )
+
+    await Promise.all(
+        walletSeed.map(async (wallet) => {
+            await prisma.wallet.create({ data: wallet })
         }),
     )
 

@@ -19,7 +19,7 @@ model User {
   bio                          String?
   mentionedUsersOnContentItems MentionedUsersOnContentItems[]
   contentItems                 ContentItem[]
-  transactionRecieved          Transaction[]                  @relation("recipient")
+  transactionReceived          Transaction[]                  @relation("recipient")
   transactionSent              Transaction[]                  @relation("sender")
 }
 
@@ -112,14 +112,11 @@ model TagsOnContentItems {
   @@id([contentItemId, tagId])
 }
 
-model lnurl_migrations {
-  id             Int       @id @default(autoincrement())
-  name           String?   @db.VarChar(255)
-  batch          Int?
-  migration_time DateTime? @db.Timestamptz(6)
-}
-
-model lnurl_migrations_lock {
-  index     Int  @id @default(autoincrement())
-  is_locked Int?
+model Wallet {
+  id          Int     @id @default(autoincrement())
+  displayName String
+  description String?
+  url         String
+  icon        String
+  rank        Int
 }

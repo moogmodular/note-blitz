@@ -1,13 +1,14 @@
 import superjson from 'superjson'
 
 import { adminRouter } from './adminRouter'
-import { metaRouter } from './metaRouter'
 import { authRouter } from './authRouter'
 import { contentItemRouter } from './contentItemRouter'
 import { createRouter } from './context'
 import { lightningRouter } from './lightningRouter'
+import { metaRouter } from './metaRouter'
 import { taxonomyRouter } from './taxonomyRouter'
 import { userRouter } from './userRouter'
+import { walletRouter } from './walletRouter'
 
 export const appRouter = createRouter()
     .transformer(superjson)
@@ -17,6 +18,7 @@ export const appRouter = createRouter()
     .merge('contentItem:', contentItemRouter)
     .merge('taxonomy:', taxonomyRouter)
     .merge('user:', userRouter)
+    .merge('wallet:', walletRouter)
     .merge('meta:', metaRouter)
 
 // export type definition of API

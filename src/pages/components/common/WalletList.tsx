@@ -14,23 +14,28 @@ const WalletListColumn = styled.a`
     align-items: center;
 `
 
+export interface Wallet {
+    id: number
+    displayName: string
+    description?: string
+    url: string
+    icon: string
+    rank: number
+}
+
 /* eslint-disable-next-line */
-export interface WalletListProps {}
+export interface WalletListProps {
+    walletList: Wallet[]
+}
 
 const WalletList = (props: WalletListProps) => {
-    const walletList = [
-        { image: 'https://picsum.photos/200/200', url: 'https://breez.technology', name: 'Breez' },
-        { image: 'https://picsum.photos/200/200', url: 'https://breez.technology', name: 'Muun' },
-        { image: 'https://picsum.photos/200/200', url: 'https://breez.technology', name: 'Blue Wallet' },
-    ]
-
     return (
         <WalletListContainer>
-            {walletList.map((wlt) => {
+            {props.walletList.map((wlt) => {
                 return (
-                    <WalletListColumn key={wlt.name} target="_blank" href={wlt.url}>
-                        <img src={wlt.image} alt={wlt.name} width={'50px'} height={'50px'} />
-                        <p>{wlt.name}</p>
+                    <WalletListColumn key={wlt.id} target="_blank" href={wlt.url}>
+                        <img src={wlt.icon} alt={wlt.displayName} width={'50px'} height={'50px'} />
+                        <p>{wlt.displayName}</p>
                     </WalletListColumn>
                 )
             })}

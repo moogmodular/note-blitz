@@ -1,10 +1,12 @@
 import autoAnimate from '@formkit/auto-animate'
-import { signIn, useSession } from 'next-auth/react'
-import { QRCodeSVG } from 'qrcode.react'
-import React, { useEffect, useRef, useState } from 'react'
+import {Accordion, AccordionDetails, AccordionSummary} from '@mui/material'
+import {ExpandMore} from '@styled-icons/material-rounded/ExpandMore'
+import {signIn, useSession} from 'next-auth/react'
+import {QRCodeSVG} from 'qrcode.react'
+import React, {useEffect, useRef, useState} from 'react'
 import styled from 'styled-components'
 
-import { trpc } from '../../../utils/trpc'
+import {trpc} from '../../../utils/trpc'
 import WalletList from '../common/WalletList'
 
 const AuthenticateContainer = styled.div`
@@ -31,6 +33,8 @@ const CopiedText = styled.div`
     color: red; ;
 `
 
+export const ExpandMoreIcon = styled(ExpandMore)``
+
 const WalletAction = styled.div`
     margin-top: 2em;
     display: flex;
@@ -54,6 +58,8 @@ const Authenticate = (props: AuthenticateProps) => {
     const [loginUrl, setLoginUrl] = useState<{ secret: string; encoded: string }>({ secret: '', encoded: '' })
     const [showCopied, setShowCopied] = useState(false)
     const parent = useRef(null)
+
+    const { data: dataWallets } = trpc.useQuery(['wallet:getRankedList'])
 
     const isSecretLoggedIn = trpc.useQuery(['auth:isSecretLoggedIn', { secret: loginUrl.secret }], {
         refetchInterval: (data) => {
@@ -98,7 +104,21 @@ const Authenticate = (props: AuthenticateProps) => {
                 <p>
                     Get your cell phone out, install one of these <b>ln-url enabled wallets...</b>
                 </p>
-                <WalletList />
+                {dataWallets ? <WalletList walletList={dataWallets.slice(0, 3)} /> : null}
+
+                <Accordion>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                    >
+                        ...other wallets
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        {dataWallets ? <WalletList walletList={dataWallets.slice(3)} /> : null}
+                    </AccordionDetails>
+                </Accordion>
+
                 <p style={{ textAlign: 'center' }}>
                     ...or <b>click on the encoded ln-url text for a copy to your clipboard</b> and authenticate with
                     anther ln-url method of your choice.
