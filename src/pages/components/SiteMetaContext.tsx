@@ -5,17 +5,79 @@ import styled from 'styled-components'
 
 import { trpc } from '../../utils/trpc'
 
+const MetaLine = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+`
+
+const MetaColumn = styled.div`
+    display: flex;
+    flex-direction: column;
+`
+
+export const MeSiteMetaContext = () => {
+    const { data: meData } = trpc.useQuery(['user:getMe'])
+
+    return (
+        <>
+            {meData ? (
+                <MetaColumn>
+                    <MetaLine>
+                        <b>Me: @{meData.userName}</b>
+                        <b>here since: {format(new Date(meData.createdAt as unknown as string), 'dd.MM.yyyy')}</b>
+                    </MetaLine>
+                    <MetaLine>
+                        <b>im mentioned {meData.totalMentioned} times</b>
+                        <b>i have contributed: {meData.totalContributions} times</b>
+                    </MetaLine>
+                    <MetaLine>
+                        <b>i was mentioned: {meData.totalMentioned} times</b>
+                    </MetaLine>
+                </MetaColumn>
+            ) : null}
+        </>
+    )
+}
+
+export const TagSiteMetaContext = ({ tag }: { tag: string }) => {
+    const { data: tagData } = trpc.useQuery(['taxonomy:getTagInfoByName', { tagName: tag }])
+
+    return (
+        <>
+            {tagData ? (
+                <MetaColumn>
+                    <MetaLine>
+                        <b>Tag: {tagData.name}</b>
+                        <b>
+                            First appearance: {format(new Date(tagData.createdAt as unknown as string), 'dd.MM.yyyy')}
+                        </b>
+                    </MetaLine>
+                    <MetaLine>
+                        <b>mentioned {tagData.contentItemCount} times</b>
+                        <b>is privileged: {tagData.privileged ? 'yes' : 'no'}</b>
+                    </MetaLine>
+                </MetaColumn>
+            ) : null}
+        </>
+    )
+}
+
 export const UserSiteMetaContext = ({ user }: { user: string }) => {
     const { data: userData } = trpc.useQuery(['user:publicInfoByName', { name: user }])
     return (
         <>
             {userData ? (
-                <>
-                    <b>Name: {userData.userName}</b>
-                    <b>Member since: {format(new Date(userData.createdAt as unknown as string), 'dd.MM.yyyy')}</b>
-                    <b>earned {userData.totalEarned} sats</b>
-                    <p>contributed {userData.totalContributions} times</p>
-                </>
+                <MetaColumn>
+                    <MetaLine>
+                        <b>Name: {userData.userName}</b>
+                        <b>Member since: {format(new Date(userData.createdAt as unknown as string), 'dd.MM.yyyy')}</b>
+                    </MetaLine>
+                    <MetaLine>
+                        <b>earned {userData.totalEarned} sats</b>
+                        <b>contributed {userData.totalContributions} times</b>
+                    </MetaLine>
+                </MetaColumn>
             ) : null}
         </>
     )
@@ -43,9 +105,9 @@ const SiteMetaContext = (props: SiteMetaContextProps) => {
             {
                 {
                     // single: <IsolatedPost slug={router.query.slug as string} />,
-                    // tag: <PostTimeline tag={router.query.tag as string} />,
+                    tag: <TagSiteMetaContext tag={router.query.tag as string} />,
                     user: <UserSiteMetaContext user={router.query.user as string} />,
-                    // timeline: <PostTimeline />,
+                    timeline: <MeSiteMetaContext />,
                 }[routerPath(router.asPath)]
             }
         </SiteMetaContextPropsContainer>

@@ -3,6 +3,24 @@ import { z } from 'zod'
 import { createRouter } from './context'
 
 export const taxonomyRouter = createRouter()
+    .query('getTagInfoByName', {
+        input: z.object({
+            tagName: z.string(),
+        }),
+        resolve: async ({ ctx, input }) => {
+            return await ctx.prisma.tag
+                .findUnique({
+                    where: { name: input.tagName },
+                    include: { contentItems: true },
+                })
+                .then((tag) => {
+                    return {
+                        ...tag,
+                        contentItemCount: tag!.contentItems.length,
+                    }
+                })
+        },
+    })
     .query('getTaxonomyStats', {
         resolve: async ({ ctx }) => {
             const tags = await ctx.prisma.tag.findMany({
