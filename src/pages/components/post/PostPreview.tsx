@@ -1,40 +1,8 @@
 import { Divider } from '@mui/material'
 import { format } from 'date-fns'
 import React from 'react'
-import styled from 'styled-components'
 
 import TagDisplayPill from '../common/TagDisplayPill'
-
-const PostBox = styled.div`
-    display: flex;
-`
-
-const PostBoxContent = styled.div`
-    padding-left: 1em;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-`
-
-const PostingFooter = styled.div`
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-`
-
-const ExcerptContainer = styled.div`
-    flex: 1;
-`
-
-const PostingFooterLeft = styled.div`
-    display: flex;
-    flex-direction: column;
-`
-
-const PillListInFooter = styled.div`
-    display: flex;
-    margin-bottom: 0.5em;
-`
 
 /* eslint-disable-next-line */
 export interface PostPreviewProps {
@@ -53,48 +21,35 @@ export interface PostPreviewProps {
 
 const PostPreview = (props: PostPreviewProps) => {
     return (
-        <PostBox>
+        <div className="flex flex-col gap-6 2xl:flex-row">
             <img
+                className="h-px-250 w-px-250"
                 onClick={() => props.handleExpand()}
                 src={props.headerImage}
                 alt="header image"
-                width={'250px'}
-                height={'250px'}
             />
-            <PostBoxContent>
-                <h3 onClick={() => props.handleExpand()}>{props.title}</h3>
-                <hr />
-                <ExcerptContainer>{props.excerpt}</ExcerptContainer>
-                <hr />
-                <PostingFooter>
-                    <PostingFooterLeft>
-                        <PillListInFooter>
-                            {props.tags?.map((tag) => {
-                                return (
-                                    <TagDisplayPill
-                                        key={tag.tagId}
-                                        tagValue={tag.tag}
-                                        tagType={'#'}
-                                        withBackground={true}
-                                    />
-                                )
-                            })}
-                        </PillListInFooter>
-                        <div style={{ display: 'flex', gap: '1em' }}>
-                            <b>
-                                by: <TagDisplayPill tagValue={props.author} tagType={'@'} />
-                            </b>
-                            <Divider light orientation={'vertical'} />
-                            <b>created: {format(props.createdAt ?? new Date(), 'dd.MM.yyyy')}</b>
-                            <Divider light orientation={'vertical'} />
-                            <b>{props.earned} sats earned</b>
-                            <Divider light orientation={'vertical'} />
-                            <b>{props.replyCount} comments</b>
-                        </div>
-                    </PostingFooterLeft>
-                </PostingFooter>
-            </PostBoxContent>
-        </PostBox>
+            <div className="flex flex-col justify-between">
+                <div className="text-xl font-bold" onClick={() => props.handleExpand()}>
+                    {props.title}
+                </div>
+                <div>{props.excerpt}</div>
+
+                <div className="flex flex-row">
+                    {props.tags?.map((tag) => {
+                        return <TagDisplayPill key={tag.tagId} tagValue={tag.tag} tagType={'#'} withBackground={true} />
+                    })}
+                </div>
+                <div className="flex flex-row justify-between">
+                    by: <TagDisplayPill tagValue={props.author} tagType={'@'} />
+                    <Divider light orientation={'vertical'} />
+                    created: {format(props.createdAt ?? new Date(), 'dd.MM.yyyy')}
+                    <Divider light orientation={'vertical'} />
+                    {props.earned} sats earned
+                    <Divider light orientation={'vertical'} />
+                    {props.replyCount} comments
+                </div>
+            </div>
+        </div>
     )
 }
 

@@ -5,58 +5,10 @@ import { DeltaStatic } from 'quill'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import Resizer from 'react-image-file-resizer'
-import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
 import ContentEditor from '../editor/ContentEditor'
-
-const NewPostContainer = styled.div`
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-`
-
-const FormContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-`
-
-const HeaderContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-`
-
-const MinimalTextField = styled(TextField)({
-    marginBottom: '0.5em',
-    '& .MuiFormLabel-root': {
-        fontFamily: 'Courier New',
-    },
-    '& .MuiInputBase-input': {
-        fontFamily: 'Courier New',
-    },
-    '& label.Mui-focused': {
-        color: 'black',
-        borderRadius: '0',
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: 'green',
-    },
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-        '&:hover fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-    },
-})
+import BorderedButton from '../BorderedButton'
 
 /* eslint-disable-next-line */
 export interface NewPostProps {
@@ -131,11 +83,12 @@ const NewPost = (props: NewPostProps) => {
     }
 
     return (
-        <NewPostContainer>
-            <b>{props.title}</b>
-            <HeaderContainer>{props.data ? <i>{props.data}</i> : null}</HeaderContainer>
-            <hr />
-            <FormContainer onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex h-full flex-col items-center justify-between">
+            <div>
+                <b>{props.title}</b>
+                {props.data ? <i>{props.data}</i> : null}
+            </div>
+            <div className="flex h-full flex-col justify-between" onSubmit={handleSubmit(onSubmit)}>
                 {image ? (
                     <img src={image} alt="post header" width={'250px'} height={'250px'} />
                 ) : (
@@ -153,7 +106,7 @@ const NewPost = (props: NewPostProps) => {
                     control={control}
                     defaultValue=""
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <MinimalTextField
+                        <TextField
                             label="Title"
                             variant="outlined"
                             value={value}
@@ -169,7 +122,7 @@ const NewPost = (props: NewPostProps) => {
                     control={control}
                     defaultValue=""
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <MinimalTextField
+                        <TextField
                             label="Excerpt"
                             variant="outlined"
                             multiline
@@ -185,9 +138,9 @@ const NewPost = (props: NewPostProps) => {
                 />
                 <ContentEditor editorState={onContentEditorChange} />
 
-                <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
-            </FormContainer>
-        </NewPostContainer>
+                <BorderedButton buttonText="Submit" action={handleSubmit(onSubmit)} />
+            </div>
+        </div>
     )
 }
 

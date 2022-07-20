@@ -1,14 +1,5 @@
 import Link from 'next/link'
 import React from 'react'
-import styled from 'styled-components'
-
-const Pill = styled.div`
-    border-radius: 16px;
-    padding: 0px 10px;
-    display: inline-block;
-    height: 20px;
-    margin-right: 0.5em;
-`
 
 /* eslint-disable-next-line */
 export interface TagDisplayPillProps {
@@ -28,9 +19,12 @@ const TagDisplayPill = (props: TagDisplayPillProps) => {
     }
 
     return (
-        <Pill style={{ backgroundColor: props.withBackground ? getColor(props.tagValue) : 'none' }}>
+        <div
+            className="mr-2 shrink rounded-lg px-3"
+            style={{ backgroundColor: props.withBackground ? getColor(props.tagValue) : 'none' }}
+        >
             <Link href={`/post/${tagPath}/${props.tagValue}`}>{`${props.tagType}${props.tagValue}`}</Link>
-        </Pill>
+        </div>
     )
 }
 

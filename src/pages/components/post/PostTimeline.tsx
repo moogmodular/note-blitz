@@ -1,23 +1,8 @@
 import autoAnimate from '@formkit/auto-animate'
 import React, { useEffect, useRef } from 'react'
-import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
 import PostView, { PreviewProps } from './PostView'
-
-const PostPreviewContainer = styled.div`
-    overflow: scroll;
-    overflow-x: hidden;
-
-    &::-webkit-scrollbar {
-        width: 0; /* Remove scrollbar space */
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #ff0000;
-    }
-`
 
 export const TimelineByUser = ({ user }: { user: string }) => {
     const { data: postData } = trpc.useQuery(['contentItem:getByUser', { userName: user }])
@@ -59,19 +44,6 @@ export const TimelineByAll = () => {
 }
 
 /* eslint-disable-next-line */
-export interface PostTimelineWhatProps extends PostTimelineProps {}
-
-export const PostTimelineWhat = (props: PostTimelineWhatProps) => {
-    if (props.user) {
-        return <TimelineByUser user={props.user} />
-    } else if (props.tag) {
-        return <TimelineByTag tag={props.tag} />
-    } else {
-        return <TimelineByAll />
-    }
-}
-
-/* eslint-disable-next-line */
 export interface PostTimelineProps {
     user?: string
     tag?: string
@@ -84,10 +56,25 @@ const PostTimeline = (props: PostTimelineProps) => {
         parent.current && autoAnimate(parent.current)
     }, [parent])
 
+    const viewParam = (props: any): string => {
+        if (props.user) {
+            return 'user'
+        } else if (props.tag) {
+            return 'tag'
+        }
+        return 'all'
+    }
+
     return (
-        <PostPreviewContainer ref={parent}>
-            <PostTimelineWhat {...props} />
-        </PostPreviewContainer>
+        <div className="no-scrollbar overflow-x-auto pt-1" ref={parent}>
+            {
+                {
+                    user: <TimelineByUser user={props.user!} />,
+                    tag: <TimelineByTag tag={props.tag!} />,
+                    all: <TimelineByAll />,
+                }[viewParam(props)]
+            }
+        </div>
     )
 }
 

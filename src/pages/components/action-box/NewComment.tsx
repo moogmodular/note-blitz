@@ -1,60 +1,12 @@
-import { Button, TextField } from '@mui/material'
 import { DeltaStatic } from 'quill'
 import React, { useContext, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
 import { ActionBoxAction, UXContext } from '../../context/UXContext'
 import ContentEditor from '../editor/ContentEditor'
-
-const NewCommentContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-`
-
-const FormContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-`
-
-const HeaderContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-`
-
-const MinimalTextField = styled(TextField)({
-    marginBottom: '0.5em',
-    '& .MuiFormLabel-root': {
-        fontFamily: 'Courier New',
-    },
-    '& .MuiInputBase-input': {
-        fontFamily: 'Courier New',
-    },
-    '& label.Mui-focused': {
-        color: 'black',
-        borderRadius: '0',
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: 'green',
-    },
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-        '&:hover fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-    },
-})
+import BorderedButton from '../BorderedButton'
+import { TextField } from '@mui/material'
 
 /* eslint-disable-next-line */
 export interface NewCommentProps {
@@ -96,19 +48,18 @@ const NewComment = (props: NewCommentProps) => {
     }
 
     return (
-        <NewCommentContainer>
-            <HeaderContainer>
+        <div className="flex h-full flex-col items-center justify-between">
+            <div>
                 <b>{props.title}</b>
                 {props.data ? <i>{props.data}</i> : null}
-            </HeaderContainer>
-            <hr />
-            <FormContainer onSubmit={handleSubmit(onSubmit)}>
+            </div>
+            <div className="flex h-full flex-col justify-between" onSubmit={handleSubmit(onSubmit)}>
                 <Controller
                     name="title"
                     control={control}
                     defaultValue=""
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <MinimalTextField
+                        <TextField
                             label="Title"
                             variant="outlined"
                             value={value}
@@ -120,9 +71,9 @@ const NewComment = (props: NewCommentProps) => {
                     rules={{ required: 'Title required' }}
                 />
                 <ContentEditor editorState={onContentEditorChange} />
-                <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
-            </FormContainer>
-        </NewCommentContainer>
+                <BorderedButton buttonText="Submit" action={handleSubmit(onSubmit)} />
+            </div>
+        </div>
     )
 }
 

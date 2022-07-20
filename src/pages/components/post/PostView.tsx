@@ -1,16 +1,9 @@
 import autoAnimate from '@formkit/auto-animate'
 import React, { useEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
 import FullPost from './FullPost'
 import PostPreview from './PostPreview'
-
-const PostViewContainer = styled.div`
-    border: 3px solid #000;
-    padding: 1rem;
-    margin-bottom: 1rem;
-`
 
 export interface PreviewProps {
     id: string
@@ -58,7 +51,7 @@ const PostView = (props: PostViewProps) => {
     }
 
     return (
-        <PostViewContainer ref={parent}>
+        <div className="bottom-1 mb-6 border-2 border-black p-4" ref={parent}>
             {expanded ? (
                 <FullPost
                     contentItemId={props.contentItemId}
@@ -69,7 +62,7 @@ const PostView = (props: PostViewProps) => {
             ) : (
                 <PostPreview handleExpand={handleExpand} {...props.postPreview} />
             )}
-        </PostViewContainer>
+        </div>
     )
 }
 

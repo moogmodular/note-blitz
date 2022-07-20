@@ -1,73 +1,13 @@
 import { useMantineTheme } from '@mantine/core'
-import { Button, TextField } from '@mui/material'
 import { signOut } from 'next-auth/react'
 import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 import { Controller, useForm } from 'react-hook-form'
 import Resizer from 'react-image-file-resizer'
-import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
-
-const EditUserContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-`
-
-const HeaderContainer = styled.div`
-    word-wrap: break-word;
-    max-width: 80%;
-    text-align: center;
-`
-
-const FormContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    height: 100%;
-`
-
-const StyledButton = styled(Button)`
-    background: transparent;
-    font-size: 1rem;
-    border: 2px solid #000000;
-    border-radius: 0;
-    color: #000000;
-    margin-top: 1em;
-    padding: 0.25em 1em;
-`
-
-const MinimalTextField = styled(TextField)({
-    '& .MuiFormLabel-root': {
-        fontFamily: 'Courier New',
-    },
-    '& .MuiInputBase-input': {
-        fontFamily: 'Courier New',
-    },
-    '& label.Mui-focused': {
-        color: 'black',
-        borderRadius: '0',
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: 'green',
-    },
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-        '&:hover fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: 'black',
-            borderRadius: '0',
-        },
-    },
-})
+import BorderedButton from '../BorderedButton'
+import { TextField } from '@mui/material'
 
 /* eslint-disable-next-line */
 export interface EditUserProps {}
@@ -122,15 +62,14 @@ const EditUser = (props: EditUserProps) => {
     }
 
     return (
-        <EditUserContainer>
+        <div className="flex h-full flex-col items-center justify-between">
             {meUserData ? (
                 <>
                     <b>Edit me: {meUserData?.userName}</b>
-                    <HeaderContainer>{meUserData?.publicKey}</HeaderContainer>
-                    <hr />
+                    <div className="break-all">{meUserData?.publicKey}</div>
                 </>
             ) : null}
-            <FormContainer onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex h-full w-full flex-col justify-between" onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <AvatarEditor ref={editor} width={250} height={250} image={image} />
                     <br />
@@ -142,7 +81,7 @@ const EditUser = (props: EditUserProps) => {
                     control={control}
                     defaultValue=""
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <MinimalTextField
+                        <TextField
                             label="User name"
                             variant="outlined"
                             value={value}
@@ -157,7 +96,7 @@ const EditUser = (props: EditUserProps) => {
                     control={control}
                     defaultValue=""
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <MinimalTextField
+                        <TextField
                             label="Bio"
                             multiline
                             minRows={5}
@@ -170,10 +109,12 @@ const EditUser = (props: EditUserProps) => {
                         />
                     )}
                 />
-                <StyledButton onClick={handleSubmit(onSubmit)}>Submit</StyledButton>
-                <StyledButton onClick={handleLogout}>Logout</StyledButton>
-            </FormContainer>
-        </EditUserContainer>
+                <div className="flex-row">
+                    <BorderedButton buttonText={'Submit'} action={handleSubmit(onSubmit)} />{' '}
+                    <BorderedButton buttonText={'Logout'} action={handleLogout} />
+                </div>
+            </div>
+        </div>
     )
 }
 

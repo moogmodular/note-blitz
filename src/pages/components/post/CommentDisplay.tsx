@@ -1,36 +1,10 @@
 import { TypographyStylesProvider } from '@mantine/core'
-import { Button } from '@mui/material'
 import { ContentItem } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import React, { useContext, useRef } from 'react'
-import styled from 'styled-components'
-
 import { trpc } from '../../../utils/trpc'
 import { ActionBoxAction, UXActionTypes, UXContext } from '../../context/UXContext'
-
-const CommentDisplayContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.5em;
-`
-
-const StyledButton = styled(Button)`
-    background: transparent;
-    font-size: 1rem;
-    border: 2px solid #000000;
-    border-radius: 0;
-    color: #000000;
-    margin: 0 1em;
-    padding: 0.25em 1em;
-    max-height: 2em;
-`
-
-const CommentFooter = styled.div`
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-`
+import BorderedButton from '../BorderedButton'
 
 /* eslint-disable-next-line */
 export interface CommentDisplayProps {
@@ -70,9 +44,9 @@ const CommentDisplay = (props: CommentDisplayProps) => {
     const createMarkup = (html: any) => ({ __html: html ? html.replace(/\n/g, '').replace(/"/g, '') : null })
 
     return (
-        <CommentDisplayContainer>
+        <div className="mt-4 flex flex-col border-2 border-gray-400 p-4">
             {props.content ? (
-                <div style={{ marginLeft: `1em` }}>
+                <div className="ml-1">
                     <b>{props?.title}</b>
                     <TypographyStylesProvider style={{ fontStyle: 'Courier' }}>
                         <div
@@ -80,20 +54,22 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                             ref={contentRender}
                         ></div>
                     </TypographyStylesProvider>
-                    <CommentFooter>
-                        <p>by: {props?.author?.userName}</p>
+                    <div className="flex flex-row-reverse">
                         {session?.user?.role === 'ADMIN' ? (
                             <>
-                                <StyledButton onClick={() => handleSoftDeleteComment(props.contentItemId)}>
-                                    Soft Delete
-                                </StyledButton>
-                                <StyledButton onClick={() => handleDeleteComment(props.contentItemId)}>
-                                    Delete
-                                </StyledButton>
+                                <BorderedButton
+                                    buttonText={'Soft Delete'}
+                                    action={() => handleSoftDeleteComment(props.contentItemId)}
+                                />
+                                <BorderedButton
+                                    buttonText={'Delete'}
+                                    action={() => handleDeleteComment(props.contentItemId)}
+                                />
                             </>
                         ) : null}
-                        <StyledButton onClick={() => handleReplyComment(props.contentItemId)}>Reply</StyledButton>
-                    </CommentFooter>
+                        <BorderedButton buttonText={'Reply'} action={() => handleReplyComment(props.contentItemId)} />
+                        <p>by: {props?.author?.userName}</p>
+                    </div>
                     <hr />
                     {commentTreeData?.children
                         ? commentTreeData.children.map((child: ContentItem & { author: Record<string, any> }) => {
@@ -112,7 +88,7 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                         : null}
                 </div>
             ) : null}
-        </CommentDisplayContainer>
+        </div>
     )
 }
 

@@ -1,23 +1,8 @@
 import { useRouter } from 'next/router'
 import React from 'react'
-import styled from 'styled-components'
 
 import { trpc } from '../../utils/trpc'
 import FullPost from './post/FullPost'
-
-const IsolatedPostPropsContainer = styled.div`
-    border: 3px solid #000;
-    padding: 1rem;
-    overflow: scroll;
-    overflow-x: hidden;
-    &::-webkit-scrollbar {
-        width: 0; /* Remove scrollbar space */
-        background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: #ff0000;
-    }
-`
 
 /* eslint-disable-next-line */
 export interface IsolatedPostProps {
@@ -43,7 +28,7 @@ const IsolatedPost = (props: IsolatedPostProps) => {
     }
 
     return (
-        <IsolatedPostPropsContainer>
+        <div className="no-scrollbar overflow-x-auto">
             {postData ? (
                 <FullPost
                     contentItemId={postData?.id!}
@@ -52,7 +37,7 @@ const IsolatedPost = (props: IsolatedPostProps) => {
                     handleSoftDeletePost={handleSoftDeletePost}
                 />
             ) : null}
-        </IsolatedPostPropsContainer>
+        </div>
     )
 }
 

@@ -1,11 +1,4 @@
 import React from 'react'
-import styled from 'styled-components'
-
-const Pill = styled.div`
-    border-radius: 16px;
-    padding: 2px 8px;
-    display: inline-block;
-`
 
 /* eslint-disable-next-line */
 export interface PublicKeyDisplayPillProps {
@@ -23,7 +16,11 @@ const PublicKeyDisplayPill = (props: PublicKeyDisplayPillProps) => {
         return `hsl(${hash % 360}, 80%, 50%)`
     }
 
-    return <Pill style={{ backgroundColor: getColor(props.publicKey ?? '') }}>{displayKey}</Pill>
+    return (
+        <div className="rounded-lg px-3" style={{ backgroundColor: getColor(props.publicKey ?? '') }}>
+            {displayKey}
+        </div>
+    )
 }
 
 export default PublicKeyDisplayPill

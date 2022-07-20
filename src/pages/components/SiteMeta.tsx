@@ -4,18 +4,10 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef } from 'react'
-import styled from 'styled-components'
 
 import SiteMetaContext from './SiteMetaContext'
 import TaxonomyList from './TaxonomyList'
 import UserList from './UserList'
-
-const SiteMetaPropsContainer = styled.div`
-    border: 3px solid #000;
-    padding: 1rem;
-    min-height: 20vh;
-    font-size: 0.8rem;
-`
 
 /* eslint-disable-next-line */
 export interface SiteMetaProps {}
@@ -38,7 +30,7 @@ function TabPanel(props: any) {
             {...other}
             ref={parent}
         >
-            {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+            {value === index && <div className="mt-8">{children}</div>}
         </div>
     )
 }
@@ -64,14 +56,12 @@ const SiteMeta = (props: SiteMetaProps) => {
     }
 
     return (
-        <SiteMetaPropsContainer>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={value} onChange={handleChange} aria-label="site meta tabs">
-                    <Tab label="Context" {...a11yProps(0)} />
-                    <Tab label="Taxonomy" {...a11yProps(1)} />
-                    <Tab label="User list" {...a11yProps(2)} />
-                </Tabs>
-            </Box>
+        <div className="h-1/4 border-2 border-black p-4">
+            <Tabs value={value} onChange={handleChange} aria-label="site meta tabs">
+                <Tab label="Context" {...a11yProps(0)} />
+                <Tab label="Taxonomy" {...a11yProps(1)} />
+                <Tab label="User list" {...a11yProps(2)} />
+            </Tabs>
             <TabPanel value={value} index={2}>
                 <UserList />
             </TabPanel>
@@ -81,7 +71,7 @@ const SiteMeta = (props: SiteMetaProps) => {
             <TabPanel value={value} index={0}>
                 <SiteMetaContext />
             </TabPanel>
-        </SiteMetaPropsContainer>
+        </div>
     )
 }
 

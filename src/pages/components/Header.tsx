@@ -1,74 +1,10 @@
-import { Button } from '@mui/material'
-import { User } from '@styled-icons/boxicons-regular/User'
-import { Flash } from '@styled-icons/entypo/Flash'
-import { LockOpen } from '@styled-icons/material/LockOpen'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import React, { useContext, useEffect, useState } from 'react'
-import styled from 'styled-components'
 
 import { trpc } from '../../utils/trpc'
 import { ActionBoxAction, UXActionTypes, UXContext } from '../context/UXContext'
-
-const StyledButton = styled(Button)`
-    background: transparent;
-    font-size: 1rem;
-    border: 2px solid #000000;
-    border-radius: 0;
-    color: #000000;
-    padding: 0.25em 1em;
-    margin-left: auto;
-`
-
-export const SmallFlash = styled(Flash)`
-    width: 25px;
-    height: 25px;
-    color: chartreuse;
-`
-
-export const LockIcon = styled(LockOpen)`
-    width: 35px;
-    height: 35px;
-    margin-left: 1em;
-`
-
-export const UserImage = styled.img`
-    width: 35px;
-    height: 35px;
-    color: brown;
-    margin-left: 1em;
-    margin-right: 1em;
-`
-
-export const UserIcon = styled(User)`
-    width: 35px;
-    height: 35px;
-    color: brown;
-    margin-left: 1em;
-    margin-right: 1em;
-`
-
-const HeaderContainer = styled.div`
-    border: 3px solid #000;
-    display: flex;
-    justify-content: space-between;
-    padding: 0.7em;
-`
-
-const LogoContainer = styled.div`
-    display: flex;
-    width: 100%;
-    justify-content: flex-start;
-    align-items: center;
-`
-
-const UserContainer = styled.div`
-    display: flex;
-`
-
-const AuthenticatedUserData = styled.div`
-    font-size: 0.9em;
-`
+import BorderedButton from './BorderedButton'
 
 /* eslint-disable-next-line */
 
@@ -81,7 +17,7 @@ const Header = (props: HeaderProps) => {
 
     const { data: session } = useSession()
 
-    const { data: dataBalance, error } = trpc.useQuery(['lightning:getNodeBalance'])
+    const mutation = trpc.useMutation(['lightning:nodeBalance'])
 
     const { data: meUserData, remove } = trpc.useQuery(['user:getMe'], {
         onSuccess: (data) => {
@@ -102,6 +38,7 @@ const Header = (props: HeaderProps) => {
     })
 
     useEffect(() => {
+        mutation.mutate()
         if (!session?.user) {
             uxDispatch({
                 type: UXActionTypes.SetActionBox,
@@ -146,17 +83,21 @@ const Header = (props: HeaderProps) => {
         })
     }
 
+    const handleGetBalance = async () => {
+        const test = await mutation.mutateAsync()
+        console.log(test)
+    }
+
     return (
-        <HeaderContainer>
-            <LogoContainer>
+        <div className="border-2 border-black p-4">
+            <div className="flex flex-row items-center">
                 <Image onClick={handleLogoCLick} src="/logo.svg" alt="note blitz logo" width={'60px'} height={'60px'} />
-                {error ? error.message : null}
-                {dataBalance ? dataBalance : null}
-                <UserContainer onClick={handleUserCLick}>
+                <div className="flex flex-row items-center" onClick={handleUserCLick}>
                     {fullUser ? (
                         <>
                             {fullUser.profileImage ? (
-                                <UserImage
+                                <img
+                                    className="ml-4 mr-4 h-12 w-12"
                                     onClick={handleLogoCLick}
                                     src={fullUser.profileImage}
                                     alt="note blitz logo"
@@ -164,19 +105,30 @@ const Header = (props: HeaderProps) => {
                                     height={'45px'}
                                 />
                             ) : (
-                                <UserIcon />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
                             )}
 
-                            <AuthenticatedUserData>
+                            <div className="hidden flex-col text-base 2xl:flex">
                                 <div>@{fullUser.userName}</div>
                                 <div>{fullUser.publicKey}</div>
-                            </AuthenticatedUserData>
+                            </div>
                         </>
                     ) : null}
-                </UserContainer>
-                {session ? <StyledButton onClick={() => handleNewPost()}>New Post</StyledButton> : null}
-            </LogoContainer>
-        </HeaderContainer>
+                </div>
+                <div className="ml-auto">
+                    {session ? <BorderedButton buttonText={'New Post'} action={handleNewPost} /> : null}
+                </div>
+                {/*<BorderedButton buttonText={'Get Balance'} action={handleGetBalance} />*/}
+            </div>
+        </div>
     )
 }
 

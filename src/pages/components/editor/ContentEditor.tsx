@@ -2,14 +2,9 @@ import { useSession } from 'next-auth/react'
 import { Delta, DeltaStatic, Sources } from 'quill'
 import React, { useMemo, useState } from 'react'
 import { UnprivilegedEditor } from 'react-quill'
-import styled from 'styled-components'
 
 import { trpc } from '../../../utils/trpc'
 import RichTextEditor from '../common/RichText'
-
-const ContentEditorContainer = styled.div`
-    flex: 1;
-`
 
 /* eslint-disable-next-line */
 export interface ContentEditorProps {
@@ -66,14 +61,14 @@ const ContentEditor = (props: ContentEditorProps) => {
     }
 
     return (
-        <ContentEditorContainer>
+        <div className="flex-1">
             <RichTextEditor
                 value={value}
                 onChange={editorChange}
                 styles={{ root: { overflowY: 'scroll', overflowX: 'auto', height: '100%' } }}
                 mentions={mentions}
             />
-        </ContentEditorContainer>
+        </div>
     )
 }
 

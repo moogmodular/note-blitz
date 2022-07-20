@@ -1,18 +1,4 @@
 import React from 'react'
-import styled from 'styled-components'
-
-const WalletListContainer = styled.div`
-    display: flex;
-    gap: 1em;
-    justify-content: space-between;
-    width: 50%;
-`
-
-const WalletListColumn = styled.a`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-`
 
 export interface Wallet {
     id: number
@@ -31,18 +17,24 @@ export interface WalletListProps {
 
 const WalletList = (props: WalletListProps) => {
     return (
-        <WalletListContainer>
+        <div className="flex flex-row">
             {props.walletList
                 ? props.walletList.map((wlt) => {
                       return (
-                          <WalletListColumn key={wlt.id} target="_blank" href={wlt.url}>
+                          <a
+                              className="flex flex-col items-center"
+                              key={wlt.id}
+                              target="_blank"
+                              href={wlt.url}
+                              rel="noreferrer"
+                          >
                               <img src={wlt.icon} alt={wlt.displayName} width={'50px'} height={'50px'} />
-                              <p>{wlt.displayName}</p>
-                          </WalletListColumn>
+                              <p className="break-words">{wlt.displayName}</p>
+                          </a>
                       )
                   })
                 : null}
-        </WalletListContainer>
+        </div>
     )
 }
 

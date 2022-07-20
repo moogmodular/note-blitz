@@ -1,22 +1,9 @@
 import { format } from 'date-fns'
 import React from 'react'
-import styled from 'styled-components'
 
 import { trpc } from '../../utils/trpc'
 import PublicKeyDisplayPill from './common/PublicKeyDisplayPill'
 import TagDisplayPill from './common/TagDisplayPill'
-
-const UserListPropsContainer = styled.div``
-
-const UserPreviewLine = styled.div`
-    display: flex;
-    height: 2rem;
-    align-items: center;
-
-    > * {
-        margin-right: 1em;
-    }
-`
 
 /* eslint-disable-next-line */
 export interface UserListProps {}
@@ -25,20 +12,27 @@ const UserList = (props: UserListProps) => {
     const { data } = trpc.useQuery(['user:getAll'])
 
     return (
-        <UserListPropsContainer>
+        <div className="flex flex-col">
             {data
                 ? data.map((user) => {
                       return (
-                          <UserPreviewLine key={user.id}>
-                              <TagDisplayPill tagValue={user.userName} tagType={'@'} />
-                              <b>{user.contentItems} Posts</b>
-                              <p>{format(new Date(user.createdAt), 'dd.MM.yyyy')}</p>
+                          <div className="mb-2 flex flex-row" key={user.id}>
+                              <div className="w-52">
+                                  <TagDisplayPill tagValue={user.userName} tagType={'@'} />
+                              </div>
+                              <div className="w-24">
+                                  <b>{user.contentItems} Posts</b>
+                              </div>
+
+                              <div className="w-32">
+                                  <p>{format(new Date(user.createdAt), 'dd.MM.yyyy')}</p>
+                              </div>
                               <PublicKeyDisplayPill publicKey={user.publicKey} />
-                          </UserPreviewLine>
+                          </div>
                       )
                   })
                 : null}
-        </UserListPropsContainer>
+        </div>
     )
 }
 

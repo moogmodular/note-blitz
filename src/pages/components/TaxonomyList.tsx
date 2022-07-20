@@ -1,10 +1,7 @@
 import React from 'react'
-import styled from 'styled-components'
 
 import { trpc } from '../../utils/trpc'
 import TagDisplayPill from './common/TagDisplayPill'
-
-const TaxonomyListPropsContainer = styled.div``
 
 /* eslint-disable-next-line */
 export interface TaxonomyListProps {}
@@ -13,18 +10,20 @@ const TaxonomyList = (props: TaxonomyListProps) => {
     const { data } = trpc.useQuery(['taxonomy:getTaxonomyStats'])
 
     return (
-        <TaxonomyListPropsContainer>
+        <div className="flex flex-col">
             {data
                 ? data.map((taxonomy) => {
                       return (
-                          <div key={taxonomy.tagId}>
-                              <TagDisplayPill tagType={'#'} withBackground={true} tagValue={taxonomy.tagName} />
+                          <div className="mb-2 flex flex-row" key={taxonomy.tagId}>
+                              <div className="w-40">
+                                  <TagDisplayPill tagType={'#'} withBackground={true} tagValue={taxonomy.tagName} />
+                              </div>
                               <b>Post Count: {taxonomy.postCount}</b>
                           </div>
                       )
                   })
                 : null}
-        </TaxonomyListPropsContainer>
+        </div>
     )
 }
 
