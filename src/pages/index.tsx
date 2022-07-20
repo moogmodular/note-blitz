@@ -3,8 +3,7 @@ import { MantineProvider } from '@mantine/core'
 import { createTheme } from '@mui/material'
 import { ThemeProvider } from '@mui/system'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import styled, { createGlobalStyle } from 'styled-components'
+import { useEffect, useRef, useState } from 'react'
 
 import ActionBox from './components/action-box/ActionBox'
 import Header from './components/Header'
@@ -12,6 +11,7 @@ import IsolatedPost from './components/IsolatedPost'
 import PostTimeline from './components/post/PostTimeline'
 import SiteMeta from './components/SiteMeta'
 import UXProvider from './context/UXContext'
+import useMediaQuery from './hooks/useMediaQuery'
 
 const theme = createTheme({
     typography: {
@@ -28,36 +28,10 @@ const theme = createTheme({
     },
 })
 
-const GlobalStyle = createGlobalStyle`
-  body {
-    font-family: 'Courier New'
-  }
-`
-const MainContainer = styled.div`
-    padding: 2em;
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-    height: 100vh;
-`
-
-const LeftRow = styled.div`
-    display: flex;
-    gap: 1em;
-    flex-direction: column;
-    width: 66vw;
-`
-
-const RightRow = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    width: 30vw;
-    justify-content: space-between;
-`
-
 export default function IndexPage() {
     const router = useRouter()
+    const [expanded, setExpanded] = useState(false)
+    const isBreakpoint = useMediaQuery(1536)
 
     const parent = useRef(null)
 
@@ -73,13 +47,16 @@ export default function IndexPage() {
         return path.split('/')[2]
     }
 
+    const handleExpand = (): void => {
+        setExpanded(!expanded)
+    }
+
     return (
-        <MantineProvider theme={{ fontFamily: 'Courier' }} withGlobalStyles withNormalizeCSS>
+        <MantineProvider theme={{ fontFamily: 'Courier New' }} withGlobalStyles withNormalizeCSS>
             <ThemeProvider theme={theme}>
                 <UXProvider>
-                    <GlobalStyle />
-                    <MainContainer>
-                        <LeftRow ref={parent}>
+                    <div className="flex h-screen w-screen flex-col gap-6 p-8 font-serif 2xl:flex-row">
+                        <div className="flex w-full flex-col gap-6 2xl:w-2/3" ref={parent}>
                             <Header />
                             {
                                 {
@@ -89,12 +66,28 @@ export default function IndexPage() {
                                     timeline: <PostTimeline />,
                                 }[routerPath(router.asPath)]
                             }
-                        </LeftRow>
-                        <RightRow>
-                            <SiteMeta />
-                            <ActionBox />
-                        </RightRow>
-                    </MainContainer>
+                        </div>
+                        {isBreakpoint ? (
+                            <div
+                                className="fixed left-0 right-0 bottom-0 flex w-full items-center justify-center border-2 border border-t-black bg-white"
+                                onClick={handleExpand}
+                            >
+                                {expanded ? (
+                                    <div>
+                                        <div>REMOVE!</div>
+                                        <ActionBox />
+                                    </div>
+                                ) : (
+                                    <div>EXPAND!</div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="flex w-full flex-col gap-6 2xl:w-1/3">
+                                <SiteMeta />
+                                <ActionBox />
+                            </div>
+                        )}
+                    </div>
                 </UXProvider>
             </ThemeProvider>
         </MantineProvider>
