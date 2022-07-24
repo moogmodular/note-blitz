@@ -83,9 +83,13 @@ const Header = (props: HeaderProps) => {
         })
     }
 
-    const handleGetBalance = async () => {
-        const test = await mutation.mutateAsync()
-        console.log(test)
+    const handleWalletClick = () => {
+        // uxDispatch({
+        //     type: UXActionTypes.SetActionBox,
+        //     payload: {
+        //         actionBoxAction: ActionBoxAction.doWallet,
+        //     },
+        // })
     }
 
     return (
@@ -107,7 +111,7 @@ const Header = (props: HeaderProps) => {
                             ) : (
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="h-6 w-6"
+                                    className="h-12 w-12"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -123,9 +127,23 @@ const Header = (props: HeaderProps) => {
                         </>
                     ) : null}
                 </div>
-                <div className="ml-auto">
-                    {session ? <BorderedButton buttonText={'New Post'} action={handleNewPost} /> : null}
-                </div>
+
+                {session ? (
+                    <div className="ml-auto flex flex-row items-center gap-6">
+                        <svg
+                            onClick={handleWalletClick}
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <BorderedButton buttonText={'New Post'} action={handleNewPost} />{' '}
+                    </div>
+                ) : null}
                 {/*<BorderedButton buttonText={'Get Balance'} action={handleGetBalance} />*/}
             </div>
         </div>

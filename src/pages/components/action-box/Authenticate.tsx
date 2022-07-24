@@ -2,16 +2,21 @@ import autoAnimate from '@formkit/auto-animate'
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import { signIn, useSession } from 'next-auth/react'
 import { QRCodeSVG } from 'qrcode.react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import { trpc } from '../../../utils/trpc'
 import WalletList from '../common/WalletList'
+import { ActionBoxAction, UXActionTypes, UXContext } from '../../context/UXContext'
+import { BarLoader } from 'react-spinners'
+
+const stopPollingAfter = 60 * 1000
 
 /* eslint-disable-next-line */
 export interface AuthenticateProps {}
 
 const Authenticate = (props: AuthenticateProps) => {
     const { data: session, status } = useSession()
+    const { state: uxState, dispatch: uxDispatch } = useContext(UXContext)
 
     const [loginUrl, setLoginUrl] = useState<{ secret: string; encoded: string }>({ secret: '', encoded: '' })
     const [showCopied, setShowCopied] = useState(false)
@@ -35,6 +40,14 @@ const Authenticate = (props: AuthenticateProps) => {
     const getLoginUrl = trpc.useQuery(['auth:getLoginUrl'], {
         onSuccess: (data) => {
             setLoginUrl(data)
+            setTimeout(() => {
+                uxDispatch({
+                    type: UXActionTypes.SetActionBox,
+                    payload: {
+                        actionBoxAction: ActionBoxAction.doSiteInfo,
+                    },
+                })
+            }, stopPollingAfter)
         },
     })
 
@@ -54,6 +67,7 @@ const Authenticate = (props: AuthenticateProps) => {
         <div className="flex h-full flex-col items-center justify-between" ref={parent}>
             <QRCodeSVG value={loginUrl.encoded} level={'Q'} size={250} />
 
+            <BarLoader width={250} />
             <div className="break-all text-center hover:text-indigo-400" onClick={handleUrlStringClick}>
                 {loginUrl.encoded}
             </div>

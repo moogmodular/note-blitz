@@ -19,12 +19,12 @@ const TagDisplayPill = (props: TagDisplayPillProps) => {
     }
 
     return (
-        <div
-            className="mr-2 shrink rounded-lg px-3"
+        <span
+            className="shrink rounded-lg px-3"
             style={{ backgroundColor: props.withBackground ? getColor(props.tagValue) : 'none' }}
         >
             <Link href={`/post/${tagPath}/${props.tagValue}`}>{`${props.tagType}${props.tagValue}`}</Link>
-        </div>
+        </span>
     )
 }
 

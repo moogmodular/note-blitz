@@ -28,7 +28,7 @@ const IsolatedPost = (props: IsolatedPostProps) => {
     }
 
     return (
-        <div className="no-scrollbar overflow-x-auto">
+        <div className="no-scrollbar overflow-x-auto border-2 border-black p-4">
             {postData ? (
                 <FullPost
                     contentItemId={postData?.id!}

@@ -28,7 +28,7 @@ const PostPreview = (props: PostPreviewProps) => {
                 src={props.headerImage}
                 alt="header image"
             />
-            <div className="flex flex-col justify-between">
+            <div className="flex w-full flex-col justify-between">
                 <div className="text-xl font-bold" onClick={() => props.handleExpand()}>
                     {props.title}
                 </div>
@@ -36,7 +36,11 @@ const PostPreview = (props: PostPreviewProps) => {
 
                 <div className="flex flex-row">
                     {props.tags?.map((tag) => {
-                        return <TagDisplayPill key={tag.tagId} tagValue={tag.tag} tagType={'#'} withBackground={true} />
+                        return (
+                            <div key={tag.tagId} className="mr-2">
+                                <TagDisplayPill tagValue={tag.tag} tagType={'#'} withBackground={true} />
+                            </div>
+                        )
                     })}
                 </div>
                 <div className="flex flex-row justify-between">

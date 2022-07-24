@@ -17,14 +17,14 @@ const UserList = (props: UserListProps) => {
                 ? data.map((user) => {
                       return (
                           <div className="mb-2 flex flex-row" key={user.id}>
-                              <div className="w-52">
+                              <div className="w-64">
                                   <TagDisplayPill tagValue={user.userName} tagType={'@'} />
                               </div>
-                              <div className="w-24">
+                              <div className="w-20">
                                   <b>{user.contentItems} Posts</b>
                               </div>
 
-                              <div className="w-32">
+                              <div className="w-28">
                                   <p>{format(new Date(user.createdAt), 'dd.MM.yyyy')}</p>
                               </div>
                               <PublicKeyDisplayPill publicKey={user.publicKey} />

@@ -94,7 +94,7 @@ const FullPost = (props: FullPostProps) => {
                             alt="header image"
                         />
 
-                        <div className="flex flex-col justify-between">
+                        <div className="flex w-full flex-col justify-between">
                             <div className="text-xl font-bold">
                                 <div onClick={() => props.handleClose()}>{postData.title}</div>
                                 <Link href={`/post/single/${postData.slug}`}>
@@ -118,12 +118,13 @@ const FullPost = (props: FullPostProps) => {
                             <div className="flex flex-row">
                                 {postData.tags?.map((tag) => {
                                     return (
-                                        <TagDisplayPill
-                                            key={tag.tagId}
-                                            tagValue={tag.tag.name}
-                                            tagType={'#'}
-                                            withBackground={true}
-                                        />
+                                        <div key={tag.tagId} className="mr-2">
+                                            <TagDisplayPill
+                                                tagValue={tag.tag.name}
+                                                tagType={'#'}
+                                                withBackground={true}
+                                            />
+                                        </div>
                                     )
                                 })}
                             </div>
