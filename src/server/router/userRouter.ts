@@ -103,3 +103,18 @@ export const userRouter = createRouter()
                 })
         },
     })
+    .query('myBalance', {
+        resolve: async ({ ctx }) => {
+            return await ctx.prisma.user
+                .findUnique({
+                    where: { id: ctx?.user?.id },
+                    include: { transactionReceived: true },
+                })
+                .then((user) => {
+                    return user!.transactionReceived.reduce((acc, cur) => acc + cur.amount, 0)
+                })
+                .catch((e) => {
+                    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'auth failed' })
+                })
+        },
+    })

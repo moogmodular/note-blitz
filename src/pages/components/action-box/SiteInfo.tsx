@@ -13,8 +13,9 @@ const SiteInfo = (props: SiteInfoProps) => {
     const { data: totalTagsData } = trpc.useQuery(['meta:totalTags'])
     const { data: totalTransactionsData } = trpc.useQuery(['meta:totalTransactions'])
     const { data: privilegedTagsData } = trpc.useQuery(['taxonomy:getPrivileged'])
+    const { data: nodeConnectionData } = trpc.useQuery(['lightning:nodeConnection'])
     return (
-        <div className="flex h-full flex-col items-center justify-between">
+        <div className="flex h-full flex-col items-center justify-around">
             <b>Site Info</b>
             <Image src="/logo.svg" alt="note blitz logo" width={'200px'} height={'200px'} />
             <div>
@@ -45,6 +46,10 @@ const SiteInfo = (props: SiteInfoProps) => {
                           })
                         : null}
                 </span>
+            </div>
+            <div>open a channel:</div>
+            <div className="break-all text-center hover:text-indigo-400">
+                {nodeConnectionData ? nodeConnectionData : null}
             </div>
             <div>Do not hesitate to reach out.</div>
             <div className="flex flex-row">
