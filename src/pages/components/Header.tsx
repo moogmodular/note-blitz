@@ -17,8 +17,6 @@ const Header = (props: HeaderProps) => {
 
     const { data: session } = useSession()
 
-    const mutation = trpc.useMutation(['lightning:nodeBalance'])
-
     const { data: meUserData, remove } = trpc.useQuery(['user:getMe'], {
         onSuccess: (data) => {
             console.log('meUserData', data)
@@ -41,7 +39,6 @@ const Header = (props: HeaderProps) => {
     })
 
     useEffect(() => {
-        mutation.mutate()
         if (!session?.user) {
             uxDispatch({
                 type: UXActionTypes.SetActionBox,

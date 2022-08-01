@@ -25,17 +25,6 @@ export async function belowInvoiceLimit(prisma: PrismaClient, userId: string) {
 }
 
 export const lightningRouter = createRouter()
-    .mutation('nodeBalance', {
-        async resolve({ ctx }) {
-            const lnd = ctx.lnd
-            const chainBalance = await getChainBalance({ lnd })
-                .then((res) => res.chain_balance)
-                .catch((e) => {
-                    console.log(e)
-                })
-            return chainBalance
-        },
-    })
     .query('nodeConnection', {
         async resolve({ ctx }) {
             const lnd = ctx.lnd
