@@ -9,6 +9,7 @@ import { metaRouter } from './metaRouter'
 import { taxonomyRouter } from './taxonomyRouter'
 import { userRouter } from './userRouter'
 import { walletRouter } from './walletRouter'
+import { generateOpenApiDocument } from 'trpc-openapi'
 
 export const appRouter = createRouter()
     .transformer(superjson)
@@ -23,3 +24,9 @@ export const appRouter = createRouter()
 
 // export type definition of API
 export type AppRouter = typeof appRouter
+
+export const openApiDocument = generateOpenApiDocument(appRouter, {
+    title: 'tRPC OpenAPI',
+    version: '1.0.0',
+    baseUrl: `https://${process.env.DOMAIN}:3000/api`,
+})

@@ -1,4 +1,4 @@
-import { randomBytes } from 'crypto'
+import { createHash, randomBytes } from 'crypto'
 import { URL } from 'url'
 
 import { bech32 } from 'bech32'
@@ -13,4 +13,8 @@ export const encodedUrl = (iUrl: string, tag: string, k1: string) => {
 
 export const k1 = () => {
     return randomBytes(32).toString('hex')
+}
+
+export function lnurlPayDescriptionHash(data: any) {
+    return createHash('sha256').update(data).digest('hex')
 }
