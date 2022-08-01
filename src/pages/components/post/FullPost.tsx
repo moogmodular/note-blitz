@@ -132,8 +132,6 @@ const FullPost = (props: FullPostProps) => {
                                 by: <TagDisplayPill tagValue={postData?.author?.userName ?? ''} tagType={'@'} />
                                 <Divider light orientation={'vertical'} />
                                 created: {format(postData.createdAt ?? new Date(), 'dd.MM.yyyy')}
-                                <Divider light orientation={'vertical'} />
-                                {postData.earned} sats earned
                                 <div className="flex flex-row-reverse">
                                     {session && session.user.role === 'ADMIN' ? (
                                         <>
@@ -173,6 +171,7 @@ const FullPost = (props: FullPostProps) => {
                                 const content = comment.content as { htmlContent?: string | undefined }
                                 return (
                                     <CommentDisplay
+                                        createdAt={comment.createdAt}
                                         key={comment.id}
                                         depth={0}
                                         author={author}

@@ -48,7 +48,6 @@ export const UserSiteMetaContext = ({ user }: { user: string }) => {
                 <div className="flex flex-col">
                     <div>Name: {userData.userName}</div>
                     <div>Member since: {format(new Date(userData.createdAt as unknown as string), 'dd.MM.yyyy')}</div>
-                    <div>earned {userData.totalEarned} sats</div>
                     <div>contributed {userData.totalContributions} times</div>
                 </div>
             ) : null}

@@ -1,6 +1,4 @@
 import '../styles/globals.css'
-
-// src/pages/_app.tsx
 import { withTRPC } from '@trpc/next'
 import { SessionProvider } from 'next-auth/react'
 import type { AppType } from 'next/dist/shared/lib/utils'
