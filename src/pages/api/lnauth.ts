@@ -11,7 +11,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const key = Buffer.from(query.key, 'hex')
         const signature = secp256k1.signatureImport(sig)
         if (secp256k1.ecdsaVerify(signature, k1, key)) {
-            const lnAuth = await prisma.lnAuth.update({ where: { k1: query.k1 }, data: { pubkey: query.key } })
+            const lnAuth = await prisma.lnAuthentication.update({
+                where: { k1: query.k1 },
+                data: { pubkey: query.key },
+            })
             return res.status(200).json({ status: 'OK' })
         }
     } catch (error) {

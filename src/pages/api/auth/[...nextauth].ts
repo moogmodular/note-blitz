@@ -1,11 +1,11 @@
 // Prisma adapter for NextAuth, optional and can be removed
-import {PrismaAdapter} from '@next-auth/prisma-adapter'
-import {User} from '@prisma/client'
-import NextAuth, {NextAuthOptions} from 'next-auth'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { User } from '@prisma/client'
+import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import {adjectives, animals, colors, Config, uniqueNamesGenerator} from 'unique-names-generator'
+import { adjectives, animals, colors, Config, uniqueNamesGenerator } from 'unique-names-generator'
 
-import {prisma} from '../../../server/db/client'
+import { prisma } from '../../../server/db/client'
 
 export const authOptions: NextAuthOptions = {
     callbacks: {
@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
                 const k1 = credentials?.k1
                 const pubkey = credentials?.pubkey
                 try {
-                    const lnAuth = await prisma.lnAuth.findUnique({ where: { k1 } })
+                    const lnAuth = await prisma.lnAuthentication.findUnique({ where: { k1 } })
                     if (lnAuth!.pubkey === pubkey) {
                         let user = await prisma.user.findUnique({ where: { publicKey: pubkey } })
                         if (!user) {
@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
                             const randomName: string = uniqueNamesGenerator(customConfig)
                             user = await prisma.user.create({ data: { userName: randomName, publicKey: pubkey } })
                         }
-                        await prisma.lnAuth.delete({ where: { k1 } })
+                        await prisma.lnAuthentication.delete({ where: { k1 } })
                         user.profileImage = ''
                         return user
                     }
