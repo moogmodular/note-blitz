@@ -6,12 +6,14 @@ import { trpc } from '../../../utils/trpc'
 import { ActionBoxAction, UXActionTypes, UXContext } from '../../context/UXContext'
 import BorderedButton from '../BorderedButton'
 import { BarLoader } from 'react-spinners'
+import { format } from 'date-fns'
 
 /* eslint-disable-next-line */
 export interface CommentDisplayProps {
     contentItemId: string
     title: string
     depth: number
+    createdAt: Date
     content: { htmlContent?: string }
     author: { userName?: string }
 }
@@ -55,10 +57,7 @@ const CommentDisplay = (props: CommentDisplayProps) => {
         >
             {props.content ? (
                 <div className="ml-1">
-                    <b>
-                        {props?.title}
-                        {props.depth}
-                    </b>
+                    <b>{props?.title}</b>
                     <TypographyStylesProvider style={{ fontStyle: 'Courier' }}>
                         <div
                             dangerouslySetInnerHTML={createMarkup(props?.content.htmlContent)}
@@ -80,7 +79,9 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                         ) : null}
                         <p className="text-sm">by: {props?.author?.userName}</p>
                         <hr />
-                        <p className="text-sm">crated: {props?.author?.userName}</p>
+                        <p className="text-sm">
+                            crated: {format(new Date(props?.createdAt as unknown as string), 'dd.MM.yyyy hh:mm')}
+                        </p>
                         <div className="ml-auto">
                             <BorderedButton
                                 buttonText={'Reply'}
@@ -96,6 +97,7 @@ const CommentDisplay = (props: CommentDisplayProps) => {
                                     key={child.id}
                                     depth={props.depth + 1}
                                     author={child.author}
+                                    createdAt={child.createdAt}
                                     content={content}
                                     contentItemId={child.id}
                                     title={child.title}
