@@ -7,6 +7,7 @@ import EditUser from './EditUser'
 import NewComment from './NewComment'
 import NewPost from './NewPost'
 import SiteInfo from './SiteInfo'
+import InOut from './InOut'
 
 /* eslint-disable-next-line */
 export interface ActionBoxProps {}
@@ -22,6 +23,7 @@ const ActionBox = (props: ActionBoxProps) => {
     return (
         <div className="h-3/4 border-2 border-black p-4" ref={parent}>
             {state.actionBoxState.actionBoxAction === ActionBoxAction.doAuth && <Authenticate />}
+            {state.actionBoxState.actionBoxAction === ActionBoxAction.doWallet && <InOut />}
             {state.actionBoxState.actionBoxAction === ActionBoxAction.doNewPost && (
                 <NewPost title={'New post'} data={state.actionBoxState.actionBoxData} />
             )}

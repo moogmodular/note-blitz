@@ -21,6 +21,7 @@ const Header = (props: HeaderProps) => {
 
     const { data: meUserData, remove } = trpc.useQuery(['user:getMe'], {
         onSuccess: (data) => {
+            console.log('meUserData', data)
             if (data?.userName) {
                 setFullUser({
                     ...data,
@@ -28,12 +29,14 @@ const Header = (props: HeaderProps) => {
                     userName: data.userName ?? '',
                     profileImage: data.profileImage ?? '',
                 })
-            } else {
-                void signOut()
+                return
             }
+            void signOut()
         },
         onError: (err) => {
-            console.log(err)
+            console.log(session)
+            console.log('ME ERROR', err)
+            void signOut({ redirect: false })
         },
     })
 
@@ -84,12 +87,12 @@ const Header = (props: HeaderProps) => {
     }
 
     const handleWalletClick = () => {
-        // uxDispatch({
-        //     type: UXActionTypes.SetActionBox,
-        //     payload: {
-        //         actionBoxAction: ActionBoxAction.doWallet,
-        //     },
-        // })
+        uxDispatch({
+            type: UXActionTypes.SetActionBox,
+            payload: {
+                actionBoxAction: ActionBoxAction.doWallet,
+            },
+        })
     }
 
     return (

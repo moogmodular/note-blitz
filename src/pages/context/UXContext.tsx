@@ -26,6 +26,7 @@ export enum ActionBoxAction {
     doReplyToComment,
     doEditUser,
     doSiteInfo,
+    doWallet,
 }
 
 const reducer = (state: IUXContext, action: UXAction) => {
