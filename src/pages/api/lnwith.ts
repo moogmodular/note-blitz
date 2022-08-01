@@ -38,7 +38,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 console.log('maxAmount', maxAmount)
                 return res.status(200).json({
                     tag: 'withdrawRequest', // type of LNURL
-                    callback: `http://${process.env.DOMAIN}:3000/api/lnwith`,
+                    callback: `https://${process.env.DOMAIN}:3000/api/lnwith`,
                     k1: query.k1,
                     defaultDescription: `Withdrawal for @${user.userName} on noteblitz.app for maximum ${
                         maxAmount - 1
@@ -72,7 +72,7 @@ async function doWithdrawal(query: { sig: string; k1: string; key: string; pr: s
         return res.status(400).json({ status: 'ERROR', reason: 'user not found' })
     }
 
-    const withdrawalData = await fetch(`http://${process.env.DOMAIN}:3000/api/create-withdrawal`, {
+    const withdrawalData = await fetch(`https://${process.env.DOMAIN}:3000/api/create-withdrawal`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
