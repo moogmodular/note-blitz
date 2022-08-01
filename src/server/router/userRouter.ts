@@ -25,15 +25,21 @@ export const userRouter = createRouter()
                     where: { userName: input.name },
                     include: {
                         contentItems: true,
-                        transactionReceived: true,
-                        transactionSent: true,
+                        invoices: true,
+                        withdrawalsFinal: true,
                     },
                 })
                 .then((user) => {
+                    const paidIn = user?.invoices
+                        .filter((invoice) => invoice.confirmedAt)
+                        .reduce((acc, cur) => acc + (cur?.mSatsReceived ?? 0), 0)
+                    const paidOut = user?.withdrawalsFinal
+                        .filter((withdrawal) => withdrawal.status === 'CONFIRMED')
+                        .reduce((acc, cur) => acc + (cur?.mSatsPaid ?? 0), 0)
                     return {
                         ...user,
                         totalContributions: user!.contentItems.length,
-                        totalEarned: user!.transactionReceived.reduce((acc, cur) => acc + cur.amount, 0),
+                        balance: paidIn ? paidIn - (paidOut ?? 0) : 0,
                     }
                 })
         },
@@ -88,13 +94,24 @@ export const userRouter = createRouter()
             return await ctx.prisma.user
                 .findUnique({
                     where: { id: ctx?.user?.id },
-                    include: { contentItems: true, transactionReceived: true, mentionedUsersOnContentItems: true },
+                    include: {
+                        contentItems: true,
+                        invoices: true,
+                        withdrawalsFinal: true,
+                        mentionedUsersOnContentItems: true,
+                    },
                 })
                 .then((user) => {
+                    const paidIn = user?.invoices
+                        .filter((invoice) => invoice.confirmedAt)
+                        .reduce((acc, cur) => acc + (cur?.mSatsReceived ?? 0), 0)
+                    const paidOut = user?.withdrawalsFinal
+                        .filter((withdrawal) => withdrawal.status === 'CONFIRMED')
+                        .reduce((acc, cur) => acc + (cur?.mSatsPaid ?? 0), 0)
                     return {
                         ...user,
                         totalContributions: user!.contentItems.length,
-                        totalEarned: user!.transactionReceived.reduce((acc, cur) => acc + cur.amount, 0),
+                        balance: paidIn ? paidIn - (paidOut ?? 0) : 0,
                         totalMentioned: user!.mentionedUsersOnContentItems.length,
                     }
                 })
@@ -108,10 +125,16 @@ export const userRouter = createRouter()
             return await ctx.prisma.user
                 .findUnique({
                     where: { id: ctx?.user?.id },
-                    include: { transactionReceived: true },
+                    include: { invoices: true, withdrawalsFinal: true },
                 })
                 .then((user) => {
-                    return user!.transactionReceived.reduce((acc, cur) => acc + cur.amount, 0)
+                    const paidIn = user?.invoices
+                        .filter((invoice) => invoice.confirmedAt)
+                        .reduce((acc, cur) => acc + (cur?.mSatsReceived ?? 0), 0)
+                    const paidOut = user?.withdrawalsFinal
+                        .filter((withdrawal) => withdrawal.status === 'CONFIRMED')
+                        .reduce((acc, cur) => acc + (cur?.mSatsPaid ?? 0), 0)
+                    return (paidIn ? paidIn - (paidOut ?? 0) : 0) / 1000
                 })
                 .catch((e) => {
                     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'auth failed' })

@@ -17,38 +17,69 @@ model User {
   userName                     String                         @unique
   profileImage                 String?
   bio                          String?
+  withdrawals                  LnWithdrawal[]
+  invoices                     Invoice[]
+  withdrawalsFinal             Withdrawal[]
   mentionedUsersOnContentItems MentionedUsersOnContentItems[]
   contentItems                 ContentItem[]
-  transactionReceived          Transaction[]                  @relation("recipient")
-  transactionSent              Transaction[]                  @relation("sender")
 }
 
-model Transaction {
-  id            String            @id @default(uuid())
-  createdAt     DateTime          @default(now())
-  type          TransactionReason @default(PAYMENT_IN)
-  amount        Int
-  fromUserId    String?
-  fromUser      User?             @relation("recipient", fields: [fromUserId], references: [id])
-  toUserId      String?
-  toUser        User?             @relation("sender", fields: [toUserId], references: [id])
-  contentItem   ContentItem?      @relation(fields: [contentItemId], references: [id])
-  contentItemId String?
-}
-
-enum TransactionReason {
-  PAYMENT_OUT
-  PAYMENT_IN
-  TIP_CONTENT_ITEM
-  UNLOCK_POST_COMMENT
-}
-
-model LnAuth {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
+model LnAuthentication {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   k1        String   @unique
   pubkey    String?
+}
+
+model LnWithdrawal {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  k1           String   @unique
+  withdrawalId String?
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model Invoice {
+  id             String    @id @default(uuid())
+  lndId          String    @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  hash           String    @unique
+  bolt11         String
+  expiresAt      DateTime
+  confirmedAt    DateTime?
+  mSatsRequested Int
+  mSatsReceived  Int?
+  cancelled      Boolean   @default(false)
+  user           User?     @relation(fields: [userId], references: [id])
+  userId         String?
+}
+
+model Withdrawal {
+  id             String            @id @default(uuid())
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  hash           String
+  bolt11         String
+  mSatsPaying    Int
+  mSatsPaid      Int?
+  mSatsFeePaying Int
+  mSatsFeePaid   Int?
+  user           User?             @relation(fields: [userId], references: [id])
+  userId         String?
+  status         WithdrawalStatus?
+}
+
+enum WithdrawalStatus {
+  CONFIRMED
+  INSUFFICIENT_BALANCE
+  INVALID_PAYMENT
+  PATHFINDING_TIMEOUT
+  ROUTE_NOT_FOUND
+  UNKNOWN_FAILURE
 }
 
 enum Role {
@@ -72,7 +103,6 @@ model ContentItem {
   authorId                  String
   headerImage               String?
   author                    User                           @relation(fields: [authorId], references: [id])
-  relatedTransactions       Transaction[]
   mentionedUsers            MentionedUsersOnContentItems[]
   tags                      TagsOnContentItems[]
   parentId                  String?

@@ -11,10 +11,6 @@ const contentItemMapper = (contentItems: any) =>
         const author = contentItem.author
         return {
             ...contentItem,
-            earned: contentItem.relatedTransactions.reduce(
-                (acc: number, cur: { amount: number }) => acc + cur.amount,
-                0,
-            ),
             content: contentItem.contentStatus === 'SOFT_DELETED' ? 'DELETED' : contentItem.content,
             excerpt: contentItem.contentStatus === 'SOFT_DELETED' ? 'DELETED' : contentItem.excerpt,
             tags: contentItem.tags.map((tag: any) => {
@@ -39,14 +35,10 @@ export const contentItemRouter = createRouter()
                 where: {
                     slug: input.slug,
                 },
-                include: {
-                    relatedTransactions: true,
-                },
             })
             const content = contentItem!.content as Prisma.JsonObject
             return {
                 ...contentItem,
-                earned: contentItem!.relatedTransactions.reduce((acc, cur) => acc + cur.amount, 0),
                 content: {
                     htmlContent:
                         contentItem!.contentStatus === 'SOFT_DELETED' ? '<div>DELETED</div>' : content.htmlContent,
@@ -70,7 +62,6 @@ export const contentItemRouter = createRouter()
                             tag: true,
                         },
                     },
-                    relatedTransactions: true,
                     author: true,
                 },
             })
@@ -79,7 +70,6 @@ export const contentItemRouter = createRouter()
 
             return {
                 ...contentItem,
-                earned: contentItem!.relatedTransactions.reduce((acc, cur) => acc + cur.amount, 0),
                 content: {
                     htmlContent:
                         contentItem!.contentStatus === 'SOFT_DELETED' ? '<div>DELETED</div>' : content.htmlContent,
@@ -107,7 +97,6 @@ export const contentItemRouter = createRouter()
                                         tag: true,
                                     },
                                 },
-                                relatedTransactions: true,
                             },
                         },
                     },
@@ -131,7 +120,6 @@ export const contentItemRouter = createRouter()
                     include: {
                         contentItem: {
                             include: {
-                                relatedTransactions: true,
                                 children: true,
                                 author: true,
                                 tags: {
@@ -166,7 +154,6 @@ export const contentItemRouter = createRouter()
                         },
                     },
                     contentItemSourceChildren: true,
-                    relatedTransactions: true,
                 },
             })
 
@@ -181,7 +168,7 @@ export const contentItemRouter = createRouter()
             const lookup = async (contentItem: any): Promise<any> => {
                 const children = await ctx.prisma.contentItem.findMany({
                     where: { parentId: contentItem.id },
-                    include: { author: true, relatedTransactions: true },
+                    include: { author: true },
                 })
 
                 const content = contentItem!.content as Prisma.JsonObject
@@ -203,7 +190,7 @@ export const contentItemRouter = createRouter()
 
             const contentItem = await ctx.prisma.contentItem.findUnique({
                 where: { id: input.contentItemId },
-                include: { author: true, relatedTransactions: true },
+                include: { author: true },
             })
 
             return await lookup(contentItem)

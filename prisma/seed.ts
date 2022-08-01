@@ -28,8 +28,10 @@ async function main() {
         await prisma.mentionedUsersOnContentItems.deleteMany(),
         await prisma.contentItem.deleteMany(),
         await prisma.user.deleteMany(),
+        await prisma.wallet.deleteMany(),
         await prisma.tag.deleteMany(),
-        await prisma.lnAuth.deleteMany(),
+        await prisma.lnAuthentication.deleteMany(),
+        await prisma.lnWithdrawal.deleteMany(),
     ])
 
     console.log(`seed new data`)

@@ -18,11 +18,22 @@ export const metaRouter = createRouter()
     })
     .query('totalTransactions', {
         async resolve({ ctx }) {
+            const invoices = await ctx.prisma.invoice.count()
+            const withdrawals = await ctx.prisma.withdrawal.count()
+
+            const invoicesConfirmedValue = await ctx.prisma.invoice
+                .findMany({
+                    where: {
+                        confirmedAt: {
+                            not: null,
+                        },
+                    },
+                })
+                .then((invoices) => invoices.reduce((acc, cur) => acc + (cur?.mSatsReceived ?? 0), 0))
+
             return {
-                transactionCount: await ctx.prisma.transaction.count(),
-                transactionValue: await ctx.prisma.transaction.findMany().then((transactions) => {
-                    return transactions.reduce((acc, cur) => acc + cur.amount, 0)
-                }),
+                transactionCount: invoices + withdrawals,
+                transactionValue: invoicesConfirmedValue,
             }
         },
     })
