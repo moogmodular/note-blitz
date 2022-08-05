@@ -19,7 +19,6 @@ const PayOut = (props: PayOutProps) => {
 
     const wasWithdrawalSettled = trpc.useQuery(['lightning:wasWithdrawalSettled', { k1: withdrawal?.k1 ?? '' }], {
         refetchInterval: (data) => {
-            console.log('wasWithdrawalSettled', data)
             if (!data?.withdrawalId) {
                 return 1000
             }
@@ -32,7 +31,6 @@ const PayOut = (props: PayOutProps) => {
     const getInvoiceUrl = trpc.useQuery(['lightning:getWithdrawalUrl'], {
         enabled: false,
         onSuccess: (data) => {
-            console.log(data)
             setWithdrawal(data)
         },
     })

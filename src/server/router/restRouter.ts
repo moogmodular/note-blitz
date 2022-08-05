@@ -35,7 +35,6 @@ export const restRouter = trpc.router<Context, OpenApiMeta>().mutation('createWi
         try {
             decoded = await decodePaymentRequest({ lnd, request: input.invoice })
         } catch (error) {
-            console.log(error)
             throw new TRPCError({ code: 'UNAUTHORIZED', message: 'could not decode invoice' })
         }
 

@@ -35,7 +35,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     .filter((withdrawal) => withdrawal.status === 'CONFIRMED')
                     .reduce((acc, cur) => acc + (cur?.mSatsPaid ?? 0), 0)
                 const maxAmount = (paidIn ? paidIn - (paidOut ?? 0) : 0) / 1000
-                console.log('maxAmount', maxAmount)
                 return res.status(200).json({
                     tag: 'withdrawRequest', // type of LNURL
                     callback: `https://${process.env.DOMAIN}:3000/api/lnwith`,

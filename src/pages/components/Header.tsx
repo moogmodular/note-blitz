@@ -19,7 +19,6 @@ const Header = (props: HeaderProps) => {
 
     const { data: meUserData, remove } = trpc.useQuery(['user:getMe'], {
         onSuccess: (data) => {
-            console.log('meUserData', data)
             if (data?.userName) {
                 setFullUser({
                     ...data,
@@ -32,8 +31,6 @@ const Header = (props: HeaderProps) => {
             void signOut()
         },
         onError: (err) => {
-            console.log(session)
-            console.log('ME ERROR', err)
             void signOut({ redirect: false })
         },
     })

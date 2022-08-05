@@ -98,7 +98,6 @@ export const lightningRouter = createRouter()
         }),
         resolve: async ({ ctx, input }) => {
             const lnd = ctx.lnd
-            console.log(input)
             if (!ctx?.user) {
                 throw new TRPCError({ code: 'UNAUTHORIZED' })
             }

@@ -57,7 +57,6 @@ const EditUser = (props: EditUserProps) => {
     }
 
     const handleNewImage = (e: any) => {
-        console.log(e)
         setImage(e.target.files[0])
     }
 

@@ -32,7 +32,6 @@ const PayIn = (props: PayInProps) => {
         ['lightning:isInvoicePaid', { lndId: invoice?.lndId ?? '', hash: invoice?.hash ?? '' }],
         {
             refetchInterval: (data) => {
-                console.log('isInvoicePaid', data)
                 if (!data?.hash) {
                     return 1000
                 }
@@ -46,13 +45,11 @@ const PayIn = (props: PayInProps) => {
     const getInvoiceUrl = trpc.useQuery(['lightning:createInvoice', { amount: props.amount }], {
         enabled: false,
         onSuccess: (data) => {
-            console.log(data)
             setInvoice(data)
         },
     })
 
     useEffect(() => {
-        console.log(props)
         getInvoiceUrl.refetch()
     }, [])
 
