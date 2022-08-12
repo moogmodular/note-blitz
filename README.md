@@ -10,6 +10,10 @@ NoteBlitz is a simple microblogging platform with a taxonomy system to enable di
 
 * `npx prsima generate`
 
+#### migrate db
+
+* `npx prsima migrate dev`
+
 #### seed db
 
 * `npx prsima db seed`
