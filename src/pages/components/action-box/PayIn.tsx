@@ -27,6 +27,7 @@ export interface PayInProps {
 const PayIn = (props: PayInProps) => {
     const parent = useRef(null)
     const [invoice, setInvoice] = useState<Invoice | undefined>(undefined)
+    const [showCopied, setShowCopied] = useState(false)
 
     const wasInvoicePaid = trpc.useQuery(
         ['lightning:isInvoicePaid', { lndId: invoice?.lndId ?? '', hash: invoice?.hash ?? '' }],
@@ -53,11 +54,23 @@ const PayIn = (props: PayInProps) => {
         getInvoiceUrl.refetch()
     }, [])
 
+    const handleUrlStringClick = () => {
+        void navigator.clipboard.writeText(invoice?.bolt11 ?? '')
+        setShowCopied(true)
+        setTimeout(() => {
+            setShowCopied(false)
+        }, 2000)
+    }
+
     return (
         <div className="flex h-full flex-col items-center justify-around" ref={parent}>
             <QRCodeSVG value={invoice?.bolt11 ?? ''} level={'Q'} size={250} />
             <div>pending invoice for: {(invoice?.mSatsRequested ?? 0) / 1000}</div>
             <BarLoader width={250} />
+            <div className="break-all text-center hover:text-indigo-400" onClick={handleUrlStringClick}>
+                {invoice?.bolt11}
+            </div>
+            {showCopied && <div>ln-url copied to clipboard!</div>}
         </div>
     )
 }
