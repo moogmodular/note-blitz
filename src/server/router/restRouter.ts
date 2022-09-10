@@ -106,7 +106,7 @@ export const restRouter = trpc
                         const maxAmount = (paidIn ? paidIn - (paidOut ?? 0) : 0) / 1000
                         return {
                             tag: 'withdrawRequest', // type of LNURL
-                            callback: `http://${process.env.DOMAIN}:3000/api/lnwith`, // TODO: change to https in prod
+                            callback: `https://${process.env.DOMAIN}:3000/api/lnwith`, // TODO: change to https in prod
                             k1: input.k1,
                             defaultDescription: `Withdrawal for @${user.userName} on noteblitz.app for maximum ${
                                 maxAmount - 1
