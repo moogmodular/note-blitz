@@ -116,6 +116,7 @@ export const restRouter = trpc
                             minWithdrawable: 10,
                             maxWithdrawable: maxAmount * 1000 - 1000,
                         }
+                        console.log({ lnUrlWithdrawal, user })
                         return lnUrlWithdrawal
                     } else {
                         reason = 'user not found'
