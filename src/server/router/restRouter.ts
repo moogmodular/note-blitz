@@ -77,6 +77,8 @@ export const restRouter = trpc
 
             const { pr, sig, key, k1 } = input
 
+            console.log('lnWith', { pr, sig, key, k1 })
+
             if (pr) {
                 return doWithdrawal({ k1, pr })
             }
@@ -140,6 +142,9 @@ async function doWithdrawal(query: { k1: string; pr: string }) {
     if (!me) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'user not found' })
     }
+
+    console.log('k1', query.k1)
+    console.log('pr', query.pr)
 
     const withdrawalData = async () => {
         let decoded: any
@@ -210,6 +215,8 @@ async function doWithdrawal(query: { k1: string; pr: string }) {
     }
 
     const resolvedWithdrawal = await withdrawalData()
+
+    console.log('resolvedWithdrawal', resolvedWithdrawal)
 
     if ('id' in resolvedWithdrawal) {
         const updatedLnWithdrawal = await prisma.lnWithdrawal
