@@ -64,7 +64,7 @@ export const restRouter = trpc
     .query('lnWith', {
         meta: { openapi: { enabled: true, method: 'GET', path: '/lnwith' } },
         input: z.object({
-            k1: z.string(),
+            k1: z.string().optional(),
             sig: z.string().optional(),
             key: z.string().optional(),
             pr: z.string().optional(),
@@ -106,7 +106,7 @@ export const restRouter = trpc
                             .filter((withdrawal) => withdrawal.status === 'CONFIRMED')
                             .reduce((acc, cur) => acc + (cur?.mSatsPaid ?? 0), 0)
                         const maxAmount = (paidIn ? paidIn - (paidOut ?? 0) : 0) / 1000
-                        return {
+                        const lnUrlWithdrawal = {
                             tag: 'withdrawRequest', // type of LNURL
                             callback: `https://${process.env.DOMAIN}:3000/api/lnwith`, // TODO: change to https in prod
                             k1: input.k1,
@@ -116,6 +116,7 @@ export const restRouter = trpc
                             minWithdrawable: 10,
                             maxWithdrawable: maxAmount * 1000 - 1000,
                         }
+                        return lnUrlWithdrawal
                     } else {
                         reason = 'user not found'
                     }
