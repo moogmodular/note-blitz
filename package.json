@@ -59,7 +59,7 @@
         "@faker-js/faker": "^7.1.0",
         "@types/jest": "^27.0.1",
         "@types/jsonwebtoken": "^8.5.8",
-        "@types/node": "18.0.0",
+        "@types/node": "18.14.1",
         "@types/node-fetch": "^2.5.11",
         "@types/react": "18.0.14",
         "@types/react-avatar-editor": "^12.0.0",
